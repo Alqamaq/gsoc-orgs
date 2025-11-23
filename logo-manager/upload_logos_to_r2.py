@@ -131,7 +131,7 @@ def process_organization(db, s3_client, org_doc, dry_run=False, force=False):
         return False
     
     # Check if already uploaded (unless force)
-    if not force and org_doc.get("logo_r2_url"):
+    if not force and org_doc.get("img_r2_url"):
         print(f"[skip] {slug}: Already uploaded to R2")
         return True
     
@@ -192,13 +192,14 @@ def process_organization(db, s3_client, org_doc, dry_run=False, force=False):
             {"_id": doc_id},
             {
                 "$set": {
-                    "logo_local_filename": r2_key,
-                    "logo_r2_url": public_url,
-                    "logo_uploaded_at": datetime.utcnow()
+                    "img_r2_filename": r2_key,
+                    "img_r2_url": public_url,
+                    "img_uploaded_at": datetime.utcnow()
                 }
             }
         )
         print(f"  Updated MongoDB for {slug}")
+        print(f"  Saved: img_r2_url = {public_url}")
     except Exception as e:
         print(f"[error] Failed to update MongoDB: {e}")
         return False
@@ -251,9 +252,9 @@ def run(test_org=None, org_slugs=None, dry_run=None, force=False, use_webp=False
                 "$and": [
                     {
                         "$or": [
-                            {"logo_r2_url": {"$exists": False}},
-                            {"logo_r2_url": None},
-                            {"logo_r2_url": ""}
+                            {"img_r2_url": {"$exists": False}},
+                            {"img_r2_url": None},
+                            {"img_r2_url": ""}
                         ]
                     },
                     {"image_slug": {"$exists": True, "$ne": None, "$ne": ""}}
@@ -279,7 +280,7 @@ def run(test_org=None, org_slugs=None, dry_run=None, force=False, use_webp=False
             result = process_organization(db, s3_client, org, dry_run=dry_run, force=force)
             if result:
                 # Check if actually uploaded or skipped
-                if org.get("logo_r2_url") and not force:
+                if org.get("img_r2_url") and not force:
                     skip_count += 1
                 else:
                     success_count += 1
