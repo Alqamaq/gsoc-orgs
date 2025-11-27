@@ -121,7 +121,7 @@ export function useQueryParams() {
   /**
    * Get all query parameters as an object
    */
-  const getAll = useCallback((): Record<string, string> => {
+  const getAllParams = useCallback((): Record<string, string> => {
     const params: Record<string, string> = {};
     searchParams?.forEach((value, key) => {
       params[key] = value;
@@ -138,7 +138,7 @@ export function useQueryParams() {
     removeMultiple,
     clear,
     has,
-    getAllParams: getAll,
+    getAllParams,
   };
 }
 

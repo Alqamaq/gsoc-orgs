@@ -96,16 +96,7 @@ export const Footer = () => {
               className="flex text-base gap-1 flex-col items-start"
             >
               <div className="flex flex-col gap-2">
-                {item.href ? (
-                  <Link
-                    href={item.href}
-                    className="flex justify-between items-center"
-                  >
-                    <span className="text-xl">{item.title}</span>
-                  </Link>
-                ) : (
-                  <p className="text-xl">{item.title}</p>
-                )}
+                <p className="text-xl">{item.title}</p>
                 {item.items &&
                   item.items.map((subItem) => (
                     <Link

@@ -3,12 +3,11 @@
 import { useEffect, useState } from "react";
 import {
   Carousel,
-  CarouselApi,
   CarouselContent,
   CarouselItem,
-  Section,
-  Heading,
-} from "@/components/ui";
+} from "@/components/ui/carousel";
+import type { CarouselApi } from "@/components/ui/carousel";
+import { Section, Heading } from "@/components/ui";
 
 export const TrendingOrgs = () => {
 const [api, setApi] = useState<CarouselApi>();
