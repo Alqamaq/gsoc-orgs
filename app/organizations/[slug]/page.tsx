@@ -49,9 +49,9 @@ export default async function OrganizationDetailPage({
         <div className="flex flex-col md:flex-row gap-6 items-start">
           {/* Logo */}
           <div className="w-24 h-24 md:w-32 md:h-32 rounded-xl bg-muted flex items-center justify-center shrink-0 border overflow-hidden">
-            {org.logo_r2_url ? (
+            {org.img_r2_url ? (
               <img
-                src={org.logo_r2_url}
+                src={org.img_r2_url}
                 alt={`${org.name} logo`}
                 className="w-full h-full object-cover"
               />

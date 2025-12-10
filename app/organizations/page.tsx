@@ -129,9 +129,9 @@ function OrganizationCard({ org }: OrganizationCardProps) {
       {/* Organization Logo/Icon */}
       <div className="flex items-center gap-4 mb-4">
         <div className="w-16 h-16 rounded-lg bg-muted flex items-center justify-center overflow-hidden">
-          {org.logo_r2_url ? (
+          {org.img_r2_url ? (
             <img
-              src={org.logo_r2_url}
+              src={org.img_r2_url}
               alt={`${org.name} logo`}
               className="w-full h-full object-cover"
             />

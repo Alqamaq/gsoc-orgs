@@ -13,7 +13,7 @@ interface Organization {
   id: string;
   name: string;
   slug: string;
-  logo_r2_url: string | null;
+  img_r2_url: string;
 }
 
 export const TrendingOrgs = () => {
@@ -88,9 +88,9 @@ export const TrendingOrgs = () => {
                 <CarouselItem className="basis-1/4 lg:basis-1/6" key={org.id}>
                   <a href={`/organizations/${org.slug}`}>
                     <div className="flex rounded-md aspect-square bg-muted items-center justify-center p-2 hover:bg-accent transition-colors overflow-hidden">
-                      {org.logo_r2_url ? (
+                      {org.img_r2_url ? (
                         <img
-                          src={org.logo_r2_url}
+                          src={org.img_r2_url}
                           alt={org.name}
                           className="w-full h-full object-cover rounded-md"
                         />
