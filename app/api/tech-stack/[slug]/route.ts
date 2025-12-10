@@ -28,6 +28,7 @@ export async function GET(
         category: true,
         total_projects: true,
         is_currently_active: true,
+        technologies: true,
       },
       orderBy: {
         total_projects: 'desc',
@@ -43,14 +44,14 @@ export async function GET(
 
     // Get the most common variation of the tech name
     const allTechs = organizations.flatMap((org) => org.technologies || [])
-    const techVariations = allTechs.filter((t) =>
+    const techVariations = allTechs.filter((t: string) =>
       t.toLowerCase().includes(techName.toLowerCase())
     )
     const mostCommon =
       techVariations.sort(
-        (a, b) =>
-          techVariations.filter((t) => t === b).length -
-          techVariations.filter((t) => t === a).length
+        (a: string, b: string) =>
+          techVariations.filter((t: string) => t === b).length -
+          techVariations.filter((t: string) => t === a).length
       )[0] || techName
 
     return NextResponse.json({
@@ -78,15 +79,14 @@ async function findTechVariations(techName: string): Promise<string[]> {
     take: 1000,
   })
 
-  const allTechs = new Set(orgs.flatMap((org) => org.technologies))
-  const variations: string[] = []
-
-  allTechs.forEach((tech) => {
-    if (tech.toLowerCase().includes(techName.toLowerCase()) ||
-        techName.toLowerCase().includes(tech.toLowerCase())) {
-      variations.push(tech)
-    }
-  })
+  const allTechs = Array.from(
+    new Set<string>(orgs.flatMap((org) => org.technologies))
+  )
+  
+  const variations = allTechs.filter((tech) =>
+    tech.toLowerCase().includes(techName.toLowerCase()) ||
+    techName.toLowerCase().includes(tech.toLowerCase())
+  )
 
   return variations.length > 0 ? variations : [techName]
 }
