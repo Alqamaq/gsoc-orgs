@@ -112,8 +112,8 @@ export default function TechStackPage() {
             <Heading variant="subsection">Top Technologies</Heading>
           </div>
           <Grid cols={{ default: 1, md: 2, lg: 3 }} gap="md">
-            {trendingStacks.map((stack) => (
-              <TechStackCard key={stack.slug} stack={stack} />
+            {trendingStacks.map((stack, index) => (
+              <TechStackCard key={`trending-${stack.name}-${index}`} stack={stack} />
             ))}
           </Grid>
         </section>
@@ -141,8 +141,8 @@ export default function TechStackPage() {
                 Showing {techStacks.length} technolog{techStacks.length !== 1 ? "ies" : "y"}
               </Text>
               <Grid cols={{ default: 1, md: 2, lg: 3 }} gap="lg">
-                {techStacks.map((stack) => (
-                  <TechStackCard key={stack.slug} stack={stack} />
+                {techStacks.map((stack, index) => (
+                  <TechStackCard key={`${stack.name}-${index}`} stack={stack} />
                 ))}
               </Grid>
             </>
