@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { MoveRight } from "lucide-react";
+import Link from "next/link";
 import { Button, Section, Heading, Text } from "@/components/ui";
 
 export const HeroComponent = () => {
@@ -65,8 +66,10 @@ export const HeroComponent = () => {
           </Text>
         </div>
         <div className="flex flex-row gap-3">
-          <Button size="lg" className="gap-4">
-            View All GSoC Orgs <MoveRight className="w-4 h-4" />
+          <Button asChild size="lg" className="gap-4">
+            <Link href="/organizations">
+              View All GSoC Orgs <MoveRight className="w-4 h-4" />
+            </Link>
           </Button>
         </div>
       </div>
