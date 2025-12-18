@@ -1,8 +1,8 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { Search } from 'lucide-react'
+import { Search, X } from 'lucide-react'
 import {
   Grid,
   CardWrapper,
@@ -13,6 +13,7 @@ import {
   Input,
 } from '@/components/ui'
 import { Organization, PaginatedResponse } from '@/lib/api'
+import { FiltersSidebar, FilterState } from './filters-sidebar'
 
 interface OrganizationsClientProps {
   initialData: PaginatedResponse<Organization>
@@ -25,6 +26,16 @@ export function OrganizationsClient({ initialData, initialPage }: OrganizationsC
   const [data, setData] = useState<PaginatedResponse<Organization>>(initialData)
   const [isLoading, setIsLoading] = useState(false)
   const [currentPage, setCurrentPage] = useState(initialPage)
+  
+  // Filter state from URL
+  const [filters, setFilters] = useState<FilterState>({
+    search: searchParams.get('q') || '',
+    year: searchParams.get('year') || null,
+    category: searchParams.get('category') || null,
+    tech: searchParams.get('tech') || null,
+    topic: searchParams.get('topic') || null,
+    difficulty: searchParams.get('difficulty') || null,
+  })
 
   // Update when URL params change
   useEffect(() => {
