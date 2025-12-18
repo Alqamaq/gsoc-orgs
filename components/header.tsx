@@ -37,7 +37,7 @@ export const Header = () => {
                                 href="/"
                                 aria-label="home"
                                 className="flex items-center space-x-2 font-semibold text-xl">
-                                <span>GSoC-Guide</span>
+                                <span>GSoC Organizations Guide</span>
                             </Link>
 
                             <button
