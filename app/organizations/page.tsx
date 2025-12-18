@@ -2,7 +2,6 @@ export const dynamic = "force-dynamic";
 
 import { Suspense } from "react";
 import { Metadata } from "next";
-import { SectionHeader } from "@/components/ui";
 import { PaginatedResponse, Organization } from "@/lib/api";
 import { apiFetchServer } from "@/lib/api.server";
 import { OrganizationsClient } from "./organizations-client";
@@ -91,20 +90,8 @@ export default async function OrganizationsPage({ searchParams }: PageProps) {
   });
 
   return (
-    <div className="space-y-12">
-      {/* Page Header */}
-      <SectionHeader
-        badge="GSoC 2026"
-        title="All Organizations"
-        description="Explore all Google Summer of Code participating organizations. Filter by technology, difficulty level, and find the perfect match for your skills and interests."
-        align="center"
-        className="max-w-3xl mx-auto"
-      />
-
-      {/* Client Component with Pagination */}
-      <Suspense fallback={<div className="text-center">Loading organizations...</div>}>
-        <OrganizationsClient initialData={data} initialPage={page} />
-      </Suspense>
-    </div>
+    <Suspense fallback={<div className="text-center py-20">Loading organizations...</div>}>
+      <OrganizationsClient initialData={data} initialPage={page} />
+    </Suspense>
   );
 }

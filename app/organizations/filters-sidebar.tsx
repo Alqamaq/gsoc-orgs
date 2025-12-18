@@ -18,7 +18,7 @@ export interface FilterState {
   difficulty: string | null
 }
 
-const YEARS = [2025, 2024, 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011, 2010]
+const YEARS = [2025, 2024, 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012]
 const CATEGORIES = [
   'Artificial Intelligence',
   'Data',
@@ -26,6 +26,8 @@ const CATEGORIES = [
   'End-user applications',
   'Infrastructure & Cloud',
   'Media',
+  'Operating systems',
+  'Programming languages',
   'Science',
   'Security',
   'Web Development',
@@ -45,16 +47,14 @@ export function FiltersSidebar({ onFilterChange, initialFilters }: FiltersSideba
   )
 
   const [expandedSections, setExpandedSections] = useState({
-    firstTime: true,
+    firstTime: false,
     years: true,
     technologies: true,
     difficulty: true,
     categories: false,
-    topics: false,
   })
 
   const [techSearch, setTechSearch] = useState('')
-  const [categorySearch, setCategorySearch] = useState('')
   const [availableTechs, setAvailableTechs] = useState<Array<{ name: string; count: number }>>([])
 
   // Fetch technologies
@@ -102,37 +102,36 @@ export function FiltersSidebar({ onFilterChange, initialFilters }: FiltersSideba
   )
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-5 space-y-5">
+      {/* Header */}
       <div className="flex items-center justify-between">
         <h3 className="font-semibold text-lg">Filters</h3>
         {hasActiveFilters && (
-          <Button variant="ghost" size="sm" onClick={clearAllFilters} className="h-auto p-1 text-xs">
-            Clear all
+          <Button variant="ghost" size="sm" onClick={clearAllFilters} className="h-auto py-1 px-2 text-xs text-muted-foreground hover:text-foreground">
+            Clear all filters
           </Button>
         )}
       </div>
 
-        {/* Search */}
-        <div className="space-y-2">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              type="search"
-              placeholder="Search..."
-              value={filters.search}
-              onChange={(e) => updateFilter('search', e.target.value)}
-              className="pl-9"
-            />
-          </div>
-        </div>
+      {/* Search */}
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <Input
+          type="search"
+          placeholder="Search..."
+          value={filters.search}
+          onChange={(e) => updateFilter('search', e.target.value)}
+          className="pl-9 h-9"
+        />
+      </div>
 
       {/* First-time Organizations */}
       <div className="space-y-2">
         <button
           onClick={() => toggleSection('firstTime')}
-          className="flex items-center justify-between w-full text-sm font-medium"
+          className="flex items-center justify-between w-full text-sm font-medium hover:text-foreground"
         >
-          First-time Organizations
+          <span>First-time Organizations</span>
           {expandedSections.firstTime ? (
             <ChevronUp className="h-4 w-4" />
           ) : (
@@ -140,27 +139,28 @@ export function FiltersSidebar({ onFilterChange, initialFilters }: FiltersSideba
           )}
         </button>
         {expandedSections.firstTime && (
-          <div className="space-y-2 pl-2">
-            <label className="flex items-center gap-2 text-sm cursor-pointer">
+          <div className="pl-1">
+            <label className="flex items-center gap-2 text-sm cursor-pointer py-1">
               <input
                 type="checkbox"
-                className="rounded"
+                className="rounded border-gray-300"
                 checked={false}
                 onChange={() => {}}
               />
-              <span className="text-sm">Show only first-time orgs (14)</span>
+              <span>Show only first-time orgs</span>
+              <span className="text-xs text-muted-foreground">(14)</span>
             </label>
           </div>
         )}
       </div>
 
-      {/* Years - 2 Column Layout */}
+      {/* Years - 2 Column Grid */}
       <div className="space-y-2">
         <button
           onClick={() => toggleSection('years')}
-          className="flex items-center justify-between w-full text-sm font-medium"
+          className="flex items-center justify-between w-full text-sm font-medium hover:text-foreground"
         >
-          Years
+          <span>Years</span>
           {expandedSections.years ? (
             <ChevronUp className="h-4 w-4" />
           ) : (
@@ -168,22 +168,20 @@ export function FiltersSidebar({ onFilterChange, initialFilters }: FiltersSideba
           )}
         </button>
         {expandedSections.years && (
-          <div className="pl-2">
-            <div className="grid grid-cols-2 gap-x-2 gap-y-2 max-h-48 overflow-y-auto">
-              {YEARS.map((year) => (
-                <label key={year} className="flex items-center gap-2 text-sm cursor-pointer">
-                  <input
-                    type="checkbox"
-                    className="rounded"
-                    checked={filters.year === year.toString()}
-                    onChange={(e) =>
-                      updateFilter('year', e.target.checked ? year.toString() : null)
-                    }
-                  />
-                  <span>{year}</span>
-                </label>
-              ))}
-            </div>
+          <div className="grid grid-cols-2 gap-x-4 gap-y-1 pl-1">
+            {YEARS.map((year) => (
+              <label key={year} className="flex items-center gap-2 text-sm cursor-pointer py-1">
+                <input
+                  type="checkbox"
+                  className="rounded border-gray-300"
+                  checked={filters.year === year.toString()}
+                  onChange={(e) =>
+                    updateFilter('year', e.target.checked ? year.toString() : null)
+                  }
+                />
+                <span>{year}</span>
+              </label>
+            ))}
           </div>
         )}
       </div>
@@ -192,9 +190,9 @@ export function FiltersSidebar({ onFilterChange, initialFilters }: FiltersSideba
       <div className="space-y-2">
         <button
           onClick={() => toggleSection('technologies')}
-          className="flex items-center justify-between w-full text-sm font-medium"
+          className="flex items-center justify-between w-full text-sm font-medium hover:text-foreground"
         >
-          Technologies
+          <span>Technologies</span>
           {expandedSections.technologies ? (
             <ChevronUp className="h-4 w-4" />
           ) : (
@@ -202,7 +200,7 @@ export function FiltersSidebar({ onFilterChange, initialFilters }: FiltersSideba
           )}
         </button>
         {expandedSections.technologies && (
-          <div className="space-y-2 pl-2">
+          <div className="space-y-2">
             <Input
               type="search"
               placeholder="Search technologies..."
@@ -210,18 +208,18 @@ export function FiltersSidebar({ onFilterChange, initialFilters }: FiltersSideba
               onChange={(e) => setTechSearch(e.target.value)}
               className="h-8 text-sm"
             />
-            <div className="space-y-2 max-h-48 overflow-y-auto">
-              {filteredTechs.slice(0, 50).map((tech) => (
-                <label key={tech.name} className="flex items-center gap-2 text-sm cursor-pointer">
+            <div className="space-y-0.5 max-h-48 overflow-y-auto pl-1">
+              {filteredTechs.slice(0, 30).map((tech) => (
+                <label key={tech.name} className="flex items-center gap-2 text-sm cursor-pointer py-1">
                   <input
                     type="checkbox"
-                    className="rounded"
+                    className="rounded border-gray-300"
                     checked={filters.tech === tech.name}
                     onChange={(e) =>
                       updateFilter('tech', e.target.checked ? tech.name : null)
                     }
                   />
-                  <span className="flex-1">{tech.name}</span>
+                  <span className="flex-1 truncate">{tech.name}</span>
                   <span className="text-xs text-muted-foreground">({tech.count})</span>
                 </label>
               ))}
@@ -234,9 +232,9 @@ export function FiltersSidebar({ onFilterChange, initialFilters }: FiltersSideba
       <div className="space-y-2">
         <button
           onClick={() => toggleSection('difficulty')}
-          className="flex items-center justify-between w-full text-sm font-medium"
+          className="flex items-center justify-between w-full text-sm font-medium hover:text-foreground"
         >
-          Difficulty
+          <span>Difficulty</span>
           {expandedSections.difficulty ? (
             <ChevronUp className="h-4 w-4" />
           ) : (
@@ -244,12 +242,12 @@ export function FiltersSidebar({ onFilterChange, initialFilters }: FiltersSideba
           )}
         </button>
         {expandedSections.difficulty && (
-          <div className="space-y-2 pl-2">
+          <div className="space-y-0.5 pl-1">
             {DIFFICULTY_LEVELS.map((level) => (
-              <label key={level} className="flex items-center gap-2 text-sm cursor-pointer">
+              <label key={level} className="flex items-center gap-2 text-sm cursor-pointer py-1">
                 <input
                   type="checkbox"
-                  className="rounded"
+                  className="rounded border-gray-300"
                   checked={filters.difficulty === level}
                   onChange={(e) =>
                     updateFilter('difficulty', e.target.checked ? level : null)
@@ -266,9 +264,9 @@ export function FiltersSidebar({ onFilterChange, initialFilters }: FiltersSideba
       <div className="space-y-2">
         <button
           onClick={() => toggleSection('categories')}
-          className="flex items-center justify-between w-full text-sm font-medium"
+          className="flex items-center justify-between w-full text-sm font-medium hover:text-foreground"
         >
-          Categories
+          <span>Categories</span>
           {expandedSections.categories ? (
             <ChevronUp className="h-4 w-4" />
           ) : (
@@ -276,65 +274,23 @@ export function FiltersSidebar({ onFilterChange, initialFilters }: FiltersSideba
           )}
         </button>
         {expandedSections.categories && (
-          <div className="space-y-2 pl-2">
-            <Input
-              type="search"
-              placeholder="Search categories..."
-              value={categorySearch}
-              onChange={(e) => setCategorySearch(e.target.value)}
-              className="h-8 text-sm"
-            />
-            <div className="space-y-2 max-h-48 overflow-y-auto">
-              {CATEGORIES.filter((cat) =>
-                cat.toLowerCase().includes(categorySearch.toLowerCase())
-              ).map((category) => (
-                <label key={category} className="flex items-center gap-2 text-sm cursor-pointer">
-                  <input
-                    type="checkbox"
-                    className="rounded"
-                    checked={filters.category === category}
-                    onChange={(e) =>
-                      updateFilter('category', e.target.checked ? category : null)
-                    }
-                  />
-                  <span>{category}</span>
-                </label>
-              ))}
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Topics */}
-      <div className="space-y-2">
-        <button
-          onClick={() => toggleSection('topics')}
-          className="flex items-center justify-between w-full text-sm font-medium"
-        >
-          Topics
-          {expandedSections.topics ? (
-            <ChevronUp className="h-4 w-4" />
-          ) : (
-            <ChevronDown className="h-4 w-4" />
-          )}
-        </button>
-        {expandedSections.topics && (
-          <div className="space-y-2 pl-2">
-            <label className="flex items-center gap-2 text-sm cursor-pointer">
-              <input
-                type="checkbox"
-                className="rounded"
-                checked={filters.topic === 'Security'}
-                onChange={(e) =>
-                  updateFilter('topic', e.target.checked ? 'Security' : null)
-                }
-              />
-              <span>Security</span>
-            </label>
+          <div className="space-y-0.5 max-h-56 overflow-y-auto pl-1">
+            {CATEGORIES.map((category) => (
+              <label key={category} className="flex items-center gap-2 text-sm cursor-pointer py-1">
+                <input
+                  type="checkbox"
+                  className="rounded border-gray-300"
+                  checked={filters.category === category}
+                  onChange={(e) =>
+                    updateFilter('category', e.target.checked ? category : null)
+                  }
+                />
+                <span>{category}</span>
+              </label>
+            ))}
           </div>
         )}
       </div>
     </div>
   )
 }
-

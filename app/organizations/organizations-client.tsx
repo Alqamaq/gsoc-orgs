@@ -142,7 +142,7 @@ export function OrganizationsClient({ initialData, initialPage }: OrganizationsC
   return (
     <div className="flex min-h-[calc(100vh-5rem)] lg:min-h-[calc(100vh-6rem)]">
       {/* Sidebar - Fixed on left, full height, scrolls independently */}
-      <aside className="hidden lg:block w-72 flex-shrink-0 border-r bg-background sticky top-20 lg:top-24 h-[calc(100vh-5rem)] lg:h-[calc(100vh-6rem)] overflow-y-auto">
+      <aside className="hidden lg:block w-72 shrink-0 border-r bg-background sticky top-20 lg:top-24 h-[calc(100vh-5rem)] lg:h-[calc(100vh-6rem)] overflow-y-auto">
         <FiltersSidebar onFilterChange={handleFilterChange} initialFilters={filters} />
       </aside>
 
@@ -342,7 +342,7 @@ function OrganizationCard({ org }: OrganizationCardProps) {
     <CardWrapper hover className="h-full flex flex-col">
       {/* Organization Logo/Icon */}
       <div className="flex items-center gap-4 mb-4">
-        <div className="w-14 h-14 rounded-lg bg-muted flex items-center justify-center overflow-hidden flex-shrink-0">
+        <div className="w-14 h-14 rounded-lg bg-muted flex items-center justify-center overflow-hidden shrink-0">
           {org.img_r2_url ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
