@@ -10,10 +10,13 @@ interface OrganizationsLayoutProps {
 /**
  * Layout wrapper for all /organizations/* routes
  * This wraps:
- * - /organizations
+ * - /organizations (with pagination)
  * - /organizations/[slug]
  * - /organizations/[slug]/projects
  * etc.
+ * 
+ * Note: Canonical tags and SEO metadata are handled in individual page.tsx files
+ * for proper canonical URL management across paginated pages
  */
 export default function OrganizationsLayout({
   children,
