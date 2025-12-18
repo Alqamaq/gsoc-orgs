@@ -139,30 +139,34 @@ export function OrganizationsClient({ initialData, initialPage }: OrganizationsC
   ].filter(Boolean) as Array<{ key: keyof FilterState; label: string; value: string }>
 
   return (
-    <div className="flex gap-8">
-      {/* Sidebar */}
-      <aside className="hidden lg:block">
+    <div className="flex h-[calc(100vh-5rem)]">
+      {/* Sidebar - Fixed Full Height */}
+      <aside className="hidden lg:block w-64 border-r overflow-y-auto">
         <FiltersSidebar onFilterChange={handleFilterChange} initialFilters={filters} />
       </aside>
 
-      {/* Main Content */}
-      <div className="flex-1">
-        {/* SEO content - only show on page 1 */}
-        {currentPage === 1 && !filters.search && !filters.tech && !filters.category && (
-          <div className="max-w-3xl mx-auto mb-12 prose prose-gray dark:prose-invert">
-            <p className="text-lg text-muted-foreground text-center">
-              Browse through all Google Summer of Code participating organizations. 
-              Discover the perfect open-source project that matches your skills and interests. 
-              Our comprehensive directory includes organizations working on Python, JavaScript, 
-              Machine Learning, Web Development, and many other technologies. Filter by your 
-              preferred tech stack and difficulty level to find beginner-friendly projects or 
-              advanced challenges.
-            </p>
+      {/* Main Content - Scrollable */}
+      <div className="flex-1 overflow-y-auto">
+        <div className="max-w-7xl mx-auto px-4 lg:px-8 py-8">
+          {/* Hero Section with Title */}
+          <div className="text-center mb-12 space-y-4">
+            <div className="inline-block px-3 py-1 bg-muted rounded-full text-sm text-muted-foreground mb-2">
+              GSoC 2026
+            </div>
+            <h1 className="text-4xl lg:text-5xl font-bold mb-4">All Organizations</h1>
+            
+            {/* SEO content - only show on page 1 */}
+            {currentPage === 1 && !filters.search && !filters.tech && !filters.category && (
+              <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
+                Explore all Google Summer of Code participating organizations. Filter by 
+                technology, difficulty level, and find the perfect match for your skills and 
+                interests.
+              </p>
+            )}
           </div>
-        )}
 
-        {/* Search and Filters Section */}
-        <div className="space-y-6 mb-8">
+          {/* Search and Filters Section */}
+          <div className="space-y-6 mb-8">
           {/* Search Bar */}
           <div className="relative max-w-2xl mx-auto">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
@@ -330,6 +334,7 @@ export function OrganizationsClient({ initialData, initialPage }: OrganizationsC
           </div>
         </div>
       )}
+        </div>
       </div>
     </div>
   )

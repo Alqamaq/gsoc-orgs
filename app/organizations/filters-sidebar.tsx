@@ -102,16 +102,15 @@ export function FiltersSidebar({ onFilterChange, initialFilters }: FiltersSideba
   )
 
   return (
-    <div className="w-64 border-r pr-6">
-      <div className="sticky top-24 space-y-6 max-h-[calc(100vh-7rem)] overflow-y-auto">
-        <div className="flex items-center justify-between">
-          <h3 className="font-semibold text-lg">Filters</h3>
-          {hasActiveFilters && (
-            <Button variant="ghost" size="sm" onClick={clearAllFilters} className="h-auto p-1 text-xs">
-              Clear all
-            </Button>
-          )}
-        </div>
+    <div className="p-6 space-y-6">
+      <div className="flex items-center justify-between">
+        <h3 className="font-semibold text-lg">Filters</h3>
+        {hasActiveFilters && (
+          <Button variant="ghost" size="sm" onClick={clearAllFilters} className="h-auto p-1 text-xs">
+            Clear all
+          </Button>
+        )}
+      </div>
 
         {/* Search */}
         <div className="space-y-2">
@@ -334,7 +333,6 @@ export function FiltersSidebar({ onFilterChange, initialFilters }: FiltersSideba
             </label>
           </div>
         )}
-      </div>
       </div>
     </div>
   )

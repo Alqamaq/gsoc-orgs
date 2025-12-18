@@ -1,7 +1,5 @@
 import { ReactNode } from "react";
-import { Container } from "@/components/ui";
 import { Header } from "@/components/header";
-import { FooterSmall } from "@/components/footer-small";
 
 interface OrganizationsLayoutProps {
   children: ReactNode;
@@ -22,22 +20,15 @@ export default function OrganizationsLayout({
   children,
 }: OrganizationsLayoutProps) {
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="h-screen bg-background flex flex-col overflow-hidden">
       {/* Header - same across all pages */}
       <Header />
       
-      {/* Main content area with consistent max-width */}
+      {/* Main content area - Full height, no padding */}
       {/* pt-20 accounts for fixed header height */}
-      <main className="flex-1 pt-20 lg:pt-24">
-        <div className="w-full py-8 lg:py-16">
-          <Container size="default" className="px-4 lg:px-6">
-            {children}
-          </Container>
-        </div>
+      <main className="flex-1 pt-20 lg:pt-24 overflow-hidden">
+        {children}
       </main>
-      
-      {/* Smaller footer for organizations pages */}
-      <FooterSmall />
     </div>
   );
 }
