@@ -1,8 +1,8 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Search, ChevronDown, ChevronUp, X } from 'lucide-react'
-import { Input, Badge, Button } from '@/components/ui'
+import { Search, ChevronDown, ChevronUp } from 'lucide-react'
+import { Input, Button } from '@/components/ui'
 
 interface FiltersSidebarProps {
   onFilterChange: (filters: FilterState) => void
@@ -52,15 +52,16 @@ export function FiltersSidebar({ onFilterChange, initialFilters }: FiltersSideba
   })
 
   const [techSearch, setTechSearch] = useState('')
+  const [categorySearch, setCategorySearch] = useState('')
   const [availableTechs, setAvailableTechs] = useState<Array<{ name: string; count: number }>>([])
 
   // Fetch technologies
   useEffect(() => {
     fetch('/api/tech-stack?limit=100')
       .then((res) => res.json())
-      .then((data) => {
+      .then((data: { items?: Array<{ name: string; usage_count?: number }> }) => {
         setAvailableTechs(
-          (data.items || []).map((item: any) => ({
+          (data.items || []).map((item) => ({
             name: item.name,
             count: item.usage_count || 0,
           }))
@@ -203,13 +204,15 @@ export function FiltersSidebar({ onFilterChange, initialFilters }: FiltersSideba
           <div className="space-y-2 pl-2">
             <Input
               type="search"
-              placeholder="Search technologies..."
-              value={techSearch}
-              onChange={(e) => setTechSearch(e.target.value)}
+              placeholder="Search categories..."
+              value={categorySearch}
+              onChange={(e) => setCategorySearch(e.target.value)}
               className="h-8 text-sm"
             />
             <div className="space-y-2 max-h-64 overflow-y-auto">
-              {CATEGORIES.map((category) => (
+              {CATEGORIES.filter((cat) =>
+                cat.toLowerCase().includes(categorySearch.toLowerCase())
+              ).map((category) => (
                 <label key={category} className="flex items-center gap-2 text-sm cursor-pointer">
                   <input
                     type="checkbox"

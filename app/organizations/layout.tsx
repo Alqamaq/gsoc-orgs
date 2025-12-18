@@ -29,9 +29,11 @@ export default function OrganizationsLayout({
       {/* Main content area with consistent max-width */}
       {/* pt-20 accounts for fixed header height */}
       <main className="flex-1 pt-20 lg:pt-24">
-        <Container size="default" className="py-8 lg:py-16">
-          {children}
-        </Container>
+        <div className="w-full py-8 lg:py-16">
+          <Container size="default" className="px-4 lg:px-6">
+            {children}
+          </Container>
+        </div>
       </main>
       
       {/* Smaller footer for organizations pages */}
