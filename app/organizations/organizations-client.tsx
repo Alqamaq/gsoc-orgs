@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Search, X } from 'lucide-react'
-import { Button, Input } from '@/components/ui'
+import { Button, Input, SectionHeader } from '@/components/ui'
 import { Organization, PaginatedResponse } from '@/lib/api'
 import { FiltersSidebar, FilterState } from './filters-sidebar'
 
@@ -25,7 +25,7 @@ export function OrganizationsClient({ initialData, initialPage }: OrganizationsC
     category: searchParams.get('category') || null,
     tech: searchParams.get('tech') || null,
     topic: searchParams.get('topic') || null,
-    difficulty: searchParams.get('difficulty') || null,
+    difficulties: searchParams.get('difficulties')?.split(',').filter(Boolean) || [],
   })
 
   useEffect(() => {
@@ -35,7 +35,7 @@ export function OrganizationsClient({ initialData, initialPage }: OrganizationsC
       category: searchParams.get('category') || null,
       tech: searchParams.get('tech') || null,
       topic: searchParams.get('topic') || null,
-      difficulty: searchParams.get('difficulty') || null,
+      difficulties: searchParams.get('difficulties')?.split(',').filter(Boolean) || [],
     }
     setFilters(newFilters)
   }, [searchParams])
@@ -59,7 +59,7 @@ export function OrganizationsClient({ initialData, initialPage }: OrganizationsC
       if (filters.category) params.set('category', filters.category)
       if (filters.tech) params.set('tech', filters.tech)
       if (filters.year) params.set('year', filters.year)
-      if (filters.difficulty) params.set('difficulty', filters.difficulty)
+      if (filters.difficulties.length > 0) params.set('difficulties', filters.difficulties.join(','))
       if (filters.topic) params.set('topic', filters.topic)
       
       const response = await fetch(`/api/organizations?${params.toString()}`)
@@ -97,7 +97,9 @@ export function OrganizationsClient({ initialData, initialPage }: OrganizationsC
     if (filterUpdates.tech) params.set('tech', filterUpdates.tech)
     if (filterUpdates.year) params.set('year', filterUpdates.year)
     if (filterUpdates.topic) params.set('topic', filterUpdates.topic)
-    if (filterUpdates.difficulty) params.set('difficulty', filterUpdates.difficulty)
+    if (filterUpdates.difficulties && filterUpdates.difficulties.length > 0) {
+      params.set('difficulties', filterUpdates.difficulties.join(','))
+    }
     router.push(`/organizations?${params.toString()}`)
   }
 
@@ -106,13 +108,29 @@ export function OrganizationsClient({ initialData, initialPage }: OrganizationsC
     handleFilterChange(newFilters)
   }
 
-  const activeFilters = [
-    filters.year && { key: 'year', label: filters.year, value: filters.year },
-    filters.category && { key: 'category', label: filters.category, value: filters.category },
-    filters.tech && { key: 'tech', label: filters.tech, value: filters.tech },
-    filters.topic && { key: 'topic', label: filters.topic, value: filters.topic },
-    filters.difficulty && { key: 'difficulty', label: filters.difficulty, value: filters.difficulty },
-  ].filter(Boolean) as Array<{ key: keyof FilterState; label: string; value: string }>
+  // Active filters for the "Clear all" button logic
+  const hasActiveFilters = filters.year !== null || 
+    filters.tech !== null || 
+    filters.topic !== null || 
+    filters.difficulties.length > 0
+
+  // Sidebar-only filters (those without inline X buttons) to show as chips
+  const sidebarFilters = [
+    filters.year && { key: 'year' as const, label: `Year: ${filters.year}`, value: filters.year },
+    filters.tech && { key: 'tech' as const, label: filters.tech, value: filters.tech },
+    filters.topic && { key: 'topic' as const, label: filters.topic, value: filters.topic },
+  ].filter(Boolean) as Array<{ key: 'year' | 'tech' | 'topic'; label: string; value: string }>
+
+  // Helper to toggle a difficulty in the array
+  const toggleDifficulty = (difficulty: string) => {
+    const newDifficulties = filters.difficulties.includes(difficulty)
+      ? filters.difficulties.filter(d => d !== difficulty)
+      : [...filters.difficulties, difficulty]
+    handleFilterChange({ ...filters, difficulties: newDifficulties })
+  }
+
+  // Check if a difficulty is selected
+  const isDifficultySelected = (difficulty: string) => filters.difficulties.includes(difficulty)
 
   return (
     <div className="flex">
@@ -125,18 +143,26 @@ export function OrganizationsClient({ initialData, initialPage }: OrganizationsC
       <div className="flex-1 lg:ml-[280px]">
         <div className="max-w-6xl mx-auto px-6 py-8">
           {/* Header Section */}
-          <div className="text-center mb-6">
-            <span className="inline-block px-2.5 py-0.5 text-[11px] font-medium bg-gray-100 text-gray-500 rounded-full mb-2">
+          {/* <div className="text-center mb-8">
+            <span className="inline-block px-3 py-1 text-xs font-medium bg-gray-100 text-gray-600 rounded-full mb-3 tracking-wide">
               GSoC 2026
             </span>
-            <h1 className="text-2xl font-semibold text-gray-900 mb-2">All Organizations</h1>
-            <p className="text-sm text-gray-500 max-w-lg mx-auto leading-relaxed">
+            <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3 italic">
+              All Organizations
+            </h1>
+            <p className="text-base text-gray-600 max-w-xl mx-auto leading-relaxed">
               Explore all Google Summer of Code participating organizations. Filter by 
               technology, difficulty level, and find the perfect match for your skills and 
               interests.
             </p>
-          </div>
-
+          </div> */}
+          <SectionHeader
+            badge="GSoC 2026"
+            title="All Organizations"
+            description="Explore all Google Summer of Code participating organizations. Filter by technology, difficulty level, and find the perfect match for your skills and interests."
+            align="center"
+            className="max-w-3xl mx-auto mb-8"
+          />
           {/* Search Bar */}
           <div className="relative max-w-xl mx-auto mb-5">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -150,61 +176,66 @@ export function OrganizationsClient({ initialData, initialPage }: OrganizationsC
           </div>
 
           {/* Filter Chips Row */}
-          <div className="flex flex-wrap items-center justify-center gap-2 mb-4">
+          <div className="flex flex-wrap items-center justify-center gap-2 mb-5">
             <button
               className={`px-3 py-1.5 text-[13px] font-medium rounded-full border transition-colors ${
-                !filters.year && !filters.tech && !filters.category && !filters.difficulty
+                !filters.year && !filters.tech && filters.difficulties.length === 0
                   ? 'bg-gray-800 text-white border-gray-800'
                   : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'
               }`}
-              onClick={() => handleFilterChange({ ...filters, year: null, tech: null, category: null, difficulty: null })}
+              onClick={() => handleFilterChange({ ...filters, year: null, tech: null, difficulties: [] })}
             >
               All
             </button>
             <button
               className={`px-3 py-1.5 text-[13px] font-medium rounded-full border transition-colors ${
-                filters.tech === 'Python'
-                  ? 'bg-gray-800 text-white border-gray-800'
-                  : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'
-              }`}
-              onClick={() => handleFilterChange({ ...filters, tech: filters.tech === 'Python' ? null : 'Python' })}
-            >
-              Python
-            </button>
-            <button
-              className={`px-3 py-1.5 text-[13px] font-medium rounded-full border transition-colors ${
-                filters.tech === 'JavaScript'
-                  ? 'bg-gray-800 text-white border-gray-800'
-                  : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'
-              }`}
-              onClick={() => handleFilterChange({ ...filters, tech: filters.tech === 'JavaScript' ? null : 'JavaScript' })}
-            >
-              JavaScript
-            </button>
-            <button
-              className={`px-3 py-1.5 text-[13px] font-medium rounded-full border transition-colors ${
-                filters.difficulty === 'Beginner Friendly'
+                isDifficultySelected('Beginner Friendly')
                   ? 'bg-amber-50 text-amber-700 border-amber-200'
                   : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'
               }`}
-              onClick={() => handleFilterChange({ ...filters, difficulty: filters.difficulty === 'Beginner Friendly' ? null : 'Beginner Friendly' })}
+              onClick={() => toggleDifficulty('Beginner Friendly')}
             >
               <span className="inline-flex items-center gap-1">
                 <span className="text-amber-500">🌱</span>
                 Beginner Friendly
+                {isDifficultySelected('Beginner Friendly') && (
+                  <X className="h-3.5 w-3.5 ml-0.5" />
+                )}
               </span>
             </button>
             <button
               className={`px-3 py-1.5 text-[13px] font-medium rounded-full border transition-colors ${
-                filters.category === 'Artificial Intelligence'
-                  ? 'bg-gray-800 text-white border-gray-800'
+                isDifficultySelected('Intermediate')
+                  ? 'bg-blue-50 text-blue-700 border-blue-200'
                   : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'
               }`}
-              onClick={() => handleFilterChange({ ...filters, category: filters.category === 'Artificial Intelligence' ? null : 'Artificial Intelligence' })}
+              onClick={() => toggleDifficulty('Intermediate')}
             >
-              Machine Learning
+              <span className="inline-flex items-center gap-1">
+                <span className="text-blue-500">⚡</span>
+                Intermediate
+                {isDifficultySelected('Intermediate') && (
+                  <X className="h-3.5 w-3.5 ml-0.5" />
+                )}
+              </span>
             </button>
-            {activeFilters.length > 0 && (
+            <button
+              className={`px-3 py-1.5 text-[13px] font-medium rounded-full border transition-colors ${
+                isDifficultySelected('Hard')
+                  ? 'bg-red-50 text-red-700 border-red-200'
+                  : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'
+              }`}
+              onClick={() => toggleDifficulty('Hard')}
+            >
+              <span className="inline-flex items-center gap-1">
+                <span className="text-red-500">🔥</span>
+                Hard
+                {isDifficultySelected('Hard') && (
+                  <X className="h-3.5 w-3.5 ml-0.5" />
+                )}
+              </span>
+            </button>
+            {hasActiveFilters && (
               <button
                 className="px-2 py-1.5 text-[13px] text-gray-400 hover:text-gray-600"
                 onClick={() => handleFilterChange({
@@ -213,7 +244,7 @@ export function OrganizationsClient({ initialData, initialPage }: OrganizationsC
                   category: null,
                   tech: null,
                   topic: null,
-                  difficulty: null,
+                  difficulties: [],
                 })}
               >
                 Clear all
@@ -221,17 +252,17 @@ export function OrganizationsClient({ initialData, initialPage }: OrganizationsC
             )}
           </div>
 
-          {/* Active Filters as Chips */}
-          {activeFilters.length > 0 && (
+          {/* Sidebar Filters as Chips (for year, tech, topic) */}
+          {sidebarFilters.length > 0 && (
             <div className="flex flex-wrap items-center justify-center gap-2 mb-5">
-              {activeFilters.map((filter) => (
+              {sidebarFilters.map((filter) => (
                 <span
                   key={filter.key}
-                  className="inline-flex items-center gap-1 px-3 py-1 text-sm bg-gray-100 text-gray-700 rounded-full cursor-pointer hover:bg-gray-200"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[13px] bg-gray-100 text-gray-700 rounded-full cursor-pointer hover:bg-gray-200 transition-colors"
                   onClick={() => removeFilter(filter.key)}
                 >
                   {filter.label}
-                  <X className="h-3 w-3" />
+                  <X className="h-3.5 w-3.5" />
                 </span>
               ))}
             </div>

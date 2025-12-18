@@ -14,7 +14,7 @@ export interface FilterState {
   category: string | null
   tech: string | null
   topic: string | null
-  difficulty: string | null
+  difficulties: string[]
 }
 
 const YEARS = [2025, 2024, 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012]
@@ -49,7 +49,7 @@ export function FiltersSidebar({ onFilterChange, initialFilters }: FiltersSideba
       category: null,
       tech: null,
       topic: null,
-      difficulty: null,
+      difficulties: [],
     }
   )
 
@@ -94,7 +94,7 @@ export function FiltersSidebar({ onFilterChange, initialFilters }: FiltersSideba
       category: null,
       tech: null,
       topic: null,
-      difficulty: null,
+      difficulties: [],
     }
     setFilters(clearedFilters)
     onFilterChange(clearedFilters)
@@ -104,7 +104,12 @@ export function FiltersSidebar({ onFilterChange, initialFilters }: FiltersSideba
     setExpandedSections((prev) => ({ ...prev, [section]: !prev[section] }))
   }
 
-  const hasActiveFilters = Object.values(filters).some((v) => v !== null && v !== '')
+  const hasActiveFilters = filters.search !== '' || 
+    filters.year !== null || 
+    filters.category !== null || 
+    filters.tech !== null || 
+    filters.topic !== null || 
+    filters.difficulties.length > 0
 
   const filteredTechs = availableTechs.filter((tech) =>
     tech.name.toLowerCase().includes(techSearch.toLowerCase())
