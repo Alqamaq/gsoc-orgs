@@ -7,29 +7,21 @@ interface OrganizationsLayoutProps {
 
 /**
  * Layout wrapper for all /organizations/* routes
- * This wraps:
- * - /organizations (with pagination)
- * - /organizations/[slug]
- * - /organizations/[slug]/projects
- * etc.
- * 
- * Note: Canonical tags and SEO metadata are handled in individual page.tsx files
- * for proper canonical URL management across paginated pages
+ * Uses a fixed header with full-height content below
  */
 export default function OrganizationsLayout({
   children,
 }: OrganizationsLayoutProps) {
   return (
-    <div className="h-screen bg-background flex flex-col overflow-hidden">
-      {/* Header - same across all pages */}
+    <div className="min-h-screen bg-background">
+      {/* Header - Fixed at top */}
       <Header />
       
-      {/* Main content area - Full height, no padding */}
-      {/* pt-20 accounts for fixed header height */}
-      <main className="flex-1 pt-20 lg:pt-24 overflow-hidden">
+      {/* Main content area */}
+      {/* pt-20 accounts for fixed header height (80px) */}
+      <main className="pt-20 lg:pt-24">
         {children}
       </main>
     </div>
   );
 }
-

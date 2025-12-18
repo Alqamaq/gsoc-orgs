@@ -93,7 +93,8 @@ export function OrganizationsClient({ initialData, initialPage }: OrganizationsC
 
   const handlePageChange = (page: number) => {
     updateURLParams({ page })
-    window.scrollTo({ top: 0, behavior: 'smooth' })
+    // Scroll to top of the content area
+    document.getElementById('content-area')?.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
   const handleFilterChange = (newFilters: FilterState) => {
@@ -139,72 +140,66 @@ export function OrganizationsClient({ initialData, initialPage }: OrganizationsC
   ].filter(Boolean) as Array<{ key: keyof FilterState; label: string; value: string }>
 
   return (
-    <div className="flex h-[calc(100vh-5rem)]">
-      {/* Sidebar - Fixed Full Height */}
-      <aside className="hidden lg:block w-64 border-r overflow-y-auto">
+    <div className="flex min-h-[calc(100vh-5rem)] lg:min-h-[calc(100vh-6rem)]">
+      {/* Sidebar - Fixed on left, full height, scrolls independently */}
+      <aside className="hidden lg:block w-72 flex-shrink-0 border-r bg-background sticky top-20 lg:top-24 h-[calc(100vh-5rem)] lg:h-[calc(100vh-6rem)] overflow-y-auto">
         <FiltersSidebar onFilterChange={handleFilterChange} initialFilters={filters} />
       </aside>
 
-      {/* Main Content - Scrollable */}
-      <div className="flex-1 overflow-y-auto">
-        <div className="max-w-7xl mx-auto px-4 lg:px-8 py-8">
-          {/* Hero Section with Title */}
-          <div className="text-center mb-12 space-y-4">
-            <div className="inline-block px-3 py-1 bg-muted rounded-full text-sm text-muted-foreground mb-2">
+      {/* Main Content Area - Scrolls with page */}
+      <div id="content-area" className="flex-1 min-w-0">
+        <div className="max-w-6xl mx-auto px-4 lg:px-8 py-8">
+          {/* Hero Section */}
+          <div className="text-center mb-10">
+            <span className="inline-block px-3 py-1 bg-muted rounded-full text-sm text-muted-foreground mb-4">
               GSoC 2026
-            </div>
+            </span>
             <h1 className="text-4xl lg:text-5xl font-bold mb-4">All Organizations</h1>
-            
-            {/* SEO content - only show on page 1 */}
-            {currentPage === 1 && !filters.search && !filters.tech && !filters.category && (
-              <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
-                Explore all Google Summer of Code participating organizations. Filter by 
-                technology, difficulty level, and find the perfect match for your skills and 
-                interests.
-              </p>
-            )}
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              Explore all Google Summer of Code participating organizations. Filter by 
+              technology, difficulty level, and find the perfect match for your skills and 
+              interests.
+            </p>
           </div>
 
-          {/* Search and Filters Section */}
-          <div className="space-y-6 mb-8">
           {/* Search Bar */}
-          <div className="relative max-w-2xl mx-auto">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+          <div className="relative max-w-2xl mx-auto mb-6">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
             <Input
               type="search"
               placeholder="Search organizations by name, technology, or keyword..."
-              className="pl-10 h-12 text-base"
+              className="pl-11 h-12 text-base rounded-full border-2"
               value={filters.search}
               onChange={(e) => handleFilterChange({ ...filters, search: e.target.value })}
             />
           </div>
 
           {/* Quick Filter Chips */}
-          <div className="flex flex-wrap items-center justify-center gap-2">
+          <div className="flex flex-wrap items-center justify-center gap-2 mb-6">
             <Badge
-              variant={!filters.tech && !filters.category ? 'default' : 'outline'}
-              className="cursor-pointer hover:bg-accent"
-              onClick={() => handleFilterChange({ ...filters, tech: null, category: null })}
+              variant={!filters.tech && !filters.category && !filters.difficulty ? 'default' : 'outline'}
+              className="cursor-pointer hover:bg-accent px-4 py-1.5"
+              onClick={() => handleFilterChange({ ...filters, tech: null, category: null, difficulty: null })}
             >
               All
             </Badge>
             <Badge
               variant={filters.tech === 'Python' ? 'default' : 'outline'}
-              className="cursor-pointer hover:bg-accent"
+              className="cursor-pointer hover:bg-accent px-4 py-1.5"
               onClick={() => handleQuickFilter('tech', 'Python')}
             >
               Python
             </Badge>
             <Badge
               variant={filters.tech === 'JavaScript' ? 'default' : 'outline'}
-              className="cursor-pointer hover:bg-accent"
+              className="cursor-pointer hover:bg-accent px-4 py-1.5"
               onClick={() => handleQuickFilter('tech', 'JavaScript')}
             >
               JavaScript
             </Badge>
             <Badge
               variant={filters.difficulty === 'Beginner Friendly' ? 'default' : 'outline'}
-              className="cursor-pointer hover:bg-accent"
+              className="cursor-pointer hover:bg-accent px-4 py-1.5"
               onClick={() => {
                 const newFilters = {
                   ...filters,
@@ -213,32 +208,25 @@ export function OrganizationsClient({ initialData, initialPage }: OrganizationsC
                 handleFilterChange(newFilters)
               }}
             >
-              Beginner Friendly
+              🌱 Beginner Friendly
             </Badge>
             <Badge
               variant={filters.category === 'Artificial Intelligence' ? 'default' : 'outline'}
-              className="cursor-pointer hover:bg-accent"
+              className="cursor-pointer hover:bg-accent px-4 py-1.5"
               onClick={() => handleQuickFilter('category', 'Artificial Intelligence')}
             >
               Machine Learning
-            </Badge>
-            <Badge
-              variant={filters.category === 'Web Development' ? 'default' : 'outline'}
-              className="cursor-pointer hover:bg-accent"
-              onClick={() => handleQuickFilter('category', 'Web Development')}
-            >
-              Web Development
             </Badge>
           </div>
 
           {/* Active Filters */}
           {activeFilters.length > 0 && (
-            <div className="flex flex-wrap items-center justify-center gap-2">
+            <div className="flex flex-wrap items-center justify-center gap-2 mb-6">
               {activeFilters.map((filter) => (
                 <Badge
                   key={filter.key}
                   variant="secondary"
-                  className="cursor-pointer gap-1 pr-1"
+                  className="cursor-pointer gap-1 pr-1.5"
                   onClick={() => removeFilter(filter.key)}
                 >
                   {filter.label}
@@ -256,84 +244,86 @@ export function OrganizationsClient({ initialData, initialPage }: OrganizationsC
                   topic: null,
                   difficulty: null,
                 })}
-                className="h-6 text-xs"
+                className="h-7 text-xs text-muted-foreground"
               >
                 Clear all
               </Button>
             </div>
           )}
-        </div>
 
-      {/* Organizations Grid */}
-      <div className="space-y-6">
-        {isLoading ? (
-          <OrganizationsGridSkeleton />
-        ) : (
-          <Grid cols={{ default: 1, md: 2, lg: 3 }} gap="lg">
-            {data.items.map((org) => (
-              <OrganizationCard key={org.id} org={org} />
-            ))}
-          </Grid>
-        )}
-      </div>
+          {/* Results count */}
+          <p className="text-center text-sm text-muted-foreground mb-8">
+            Showing {data.total} organizations
+          </p>
 
-      {/* Pagination Controls */}
-      {data.pages > 1 && (
-        <div className="flex flex-col items-center gap-6 pt-8">
-          {/* Page Numbers */}
-          <div className="flex flex-wrap items-center justify-center gap-2">
-            {/* Previous Button */}
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => handlePageChange(currentPage - 1)}
-              disabled={currentPage === 1 || isLoading}
-            >
-              Previous
-            </Button>
-
-            {/* Page Numbers */}
-            {Array.from({ length: Math.min(data.pages, 10) }, (_, i) => {
-              // Show first 3, current page ± 2, and last 3 pages
-              const pageNum = i + 1
-              const shouldShow =
-                pageNum <= 3 ||
-                pageNum >= data.pages - 2 ||
-                Math.abs(pageNum - currentPage) <= 2
-
-              if (!shouldShow) {
-                if (pageNum === 4 || pageNum === data.pages - 3) {
-                  return <span key={i} className="px-2">...</span>
-                }
-                return null
-              }
-
-              return (
-                <Button
-                  key={i}
-                  variant={pageNum === currentPage ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => handlePageChange(pageNum)}
-                  disabled={isLoading}
-                  className="min-w-[40px]"
-                >
-                  {pageNum}
-                </Button>
-              )
-            })}
-
-            {/* Next Button */}
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => handlePageChange(currentPage + 1)}
-              disabled={currentPage === data.pages || isLoading}
-            >
-              Next
-            </Button>
+          {/* Organizations Grid */}
+          <div className="mb-8">
+            {isLoading ? (
+              <OrganizationsGridSkeleton />
+            ) : (
+              <Grid cols={{ default: 1, md: 2, xl: 3 }} gap="lg">
+                {data.items.map((org) => (
+                  <OrganizationCard key={org.id} org={org} />
+                ))}
+              </Grid>
+            )}
           </div>
-        </div>
-      )}
+
+          {/* Pagination Controls */}
+          {data.pages > 1 && (
+            <div className="flex flex-col items-center gap-4 py-8 border-t">
+              <div className="flex flex-wrap items-center justify-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  disabled={currentPage === 1 || isLoading}
+                >
+                  Previous
+                </Button>
+
+                {Array.from({ length: Math.min(data.pages, 10) }, (_, i) => {
+                  const pageNum = i + 1
+                  const shouldShow =
+                    pageNum <= 3 ||
+                    pageNum >= data.pages - 2 ||
+                    Math.abs(pageNum - currentPage) <= 1
+
+                  if (!shouldShow) {
+                    if (pageNum === 4 || pageNum === data.pages - 3) {
+                      return <span key={i} className="px-2 text-muted-foreground">...</span>
+                    }
+                    return null
+                  }
+
+                  return (
+                    <Button
+                      key={i}
+                      variant={pageNum === currentPage ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => handlePageChange(pageNum)}
+                      disabled={isLoading}
+                      className="min-w-[40px]"
+                    >
+                      {pageNum}
+                    </Button>
+                  )
+                })}
+
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  disabled={currentPage === data.pages || isLoading}
+                >
+                  Next
+                </Button>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                Page {currentPage} of {data.pages}
+              </p>
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -352,7 +342,7 @@ function OrganizationCard({ org }: OrganizationCardProps) {
     <CardWrapper hover className="h-full flex flex-col">
       {/* Organization Logo/Icon */}
       <div className="flex items-center gap-4 mb-4">
-        <div className="w-16 h-16 rounded-lg bg-muted flex items-center justify-center overflow-hidden">
+        <div className="w-14 h-14 rounded-lg bg-muted flex items-center justify-center overflow-hidden flex-shrink-0">
           {org.img_r2_url ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
@@ -361,12 +351,12 @@ function OrganizationCard({ org }: OrganizationCardProps) {
               className="w-full h-full object-cover"
             />
           ) : (
-            <span className="text-2xl font-bold text-muted-foreground">
+            <span className="text-xl font-bold text-muted-foreground">
               {org.name.charAt(0)}
             </span>
           )}
         </div>
-        <div className="flex-1">
+        <div className="min-w-0 flex-1">
           <Heading variant="small" className="line-clamp-1">
             {org.name}
           </Heading>
@@ -382,7 +372,7 @@ function OrganizationCard({ org }: OrganizationCardProps) {
       </Text>
 
       {/* Technologies */}
-      <div className="flex flex-wrap gap-2 mb-4">
+      <div className="flex flex-wrap gap-1.5 mb-4">
         {org.technologies.slice(0, 3).map((tech) => (
           <Badge key={tech} variant="secondary" className="text-xs">
             {tech}
@@ -413,7 +403,7 @@ function OrganizationCard({ org }: OrganizationCardProps) {
  */
 function OrganizationsGridSkeleton() {
   return (
-    <Grid cols={{ default: 1, md: 2, lg: 3 }} gap="lg">
+    <Grid cols={{ default: 1, md: 2, xl: 3 }} gap="lg">
       {Array.from({ length: 6 }).map((_, i) => (
         <CardWrapper key={i} className="h-64 animate-pulse">
           <div className="h-full bg-muted/50 rounded-md" />
@@ -422,4 +412,3 @@ function OrganizationsGridSkeleton() {
     </Grid>
   )
 }
-
