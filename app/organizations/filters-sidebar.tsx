@@ -18,7 +18,7 @@ export interface FilterState {
   difficulty: string | null
 }
 
-const YEARS = [2025, 2024, 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016]
+const YEARS = [2025, 2024, 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011, 2010]
 const CATEGORIES = [
   'Artificial Intelligence',
   'Data',
@@ -30,6 +30,7 @@ const CATEGORIES = [
   'Security',
   'Web Development',
 ]
+const DIFFICULTY_LEVELS = ['Beginner Friendly', 'Intermediate', 'Advanced']
 
 export function FiltersSidebar({ onFilterChange, initialFilters }: FiltersSidebarProps) {
   const [filters, setFilters] = useState<FilterState>(
@@ -44,11 +45,12 @@ export function FiltersSidebar({ onFilterChange, initialFilters }: FiltersSideba
   )
 
   const [expandedSections, setExpandedSections] = useState({
-    shortcuts: false,
+    firstTime: true,
     years: true,
-    categories: true,
+    technologies: true,
+    difficulty: true,
+    categories: false,
     topics: false,
-    technologies: false,
   })
 
   const [techSearch, setTechSearch] = useState('')
@@ -100,44 +102,45 @@ export function FiltersSidebar({ onFilterChange, initialFilters }: FiltersSideba
   )
 
   return (
-    <div className="w-64 border-r pr-6 space-y-6">
-      <div className="flex items-center justify-between">
-        <h3 className="font-semibold text-lg">Filters</h3>
-        {hasActiveFilters && (
-          <Button variant="ghost" size="sm" onClick={clearAllFilters} className="h-auto p-1">
-            Clear all filters
-          </Button>
-        )}
-      </div>
-
-      {/* Search */}
-      <div className="space-y-2">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            type="search"
-            placeholder="Search..."
-            value={filters.search}
-            onChange={(e) => updateFilter('search', e.target.value)}
-            className="pl-9"
-          />
+    <div className="w-64 border-r pr-6">
+      <div className="sticky top-24 space-y-6 max-h-[calc(100vh-7rem)] overflow-y-auto">
+        <div className="flex items-center justify-between">
+          <h3 className="font-semibold text-lg">Filters</h3>
+          {hasActiveFilters && (
+            <Button variant="ghost" size="sm" onClick={clearAllFilters} className="h-auto p-1 text-xs">
+              Clear all
+            </Button>
+          )}
         </div>
-      </div>
 
-      {/* Shortcuts */}
+        {/* Search */}
+        <div className="space-y-2">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              type="search"
+              placeholder="Search..."
+              value={filters.search}
+              onChange={(e) => updateFilter('search', e.target.value)}
+              className="pl-9"
+            />
+          </div>
+        </div>
+
+      {/* First-time Organizations */}
       <div className="space-y-2">
         <button
-          onClick={() => toggleSection('shortcuts')}
+          onClick={() => toggleSection('firstTime')}
           className="flex items-center justify-between w-full text-sm font-medium"
         >
-          Shortcuts
-          {expandedSections.shortcuts ? (
+          First-time Organizations
+          {expandedSections.firstTime ? (
             <ChevronUp className="h-4 w-4" />
           ) : (
             <ChevronDown className="h-4 w-4" />
           )}
         </button>
-        {expandedSections.shortcuts && (
+        {expandedSections.firstTime && (
           <div className="space-y-2 pl-2">
             <label className="flex items-center gap-2 text-sm cursor-pointer">
               <input
@@ -146,13 +149,13 @@ export function FiltersSidebar({ onFilterChange, initialFilters }: FiltersSideba
                 checked={false}
                 onChange={() => {}}
               />
-              <span>First-time organizations (14)</span>
+              <span className="text-sm">Show only first-time orgs (14)</span>
             </label>
           </div>
         )}
       </div>
 
-      {/* Years */}
+      {/* Years - 2 Column Layout */}
       <div className="space-y-2">
         <button
           onClick={() => toggleSection('years')}
@@ -166,23 +169,96 @@ export function FiltersSidebar({ onFilterChange, initialFilters }: FiltersSideba
           )}
         </button>
         {expandedSections.years && (
-          <div className="space-y-2 pl-2 max-h-64 overflow-y-auto">
-            {YEARS.map((year) => (
-              <label key={year} className="flex items-center gap-2 text-sm cursor-pointer">
+          <div className="pl-2">
+            <div className="grid grid-cols-2 gap-x-2 gap-y-2 max-h-48 overflow-y-auto">
+              {YEARS.map((year) => (
+                <label key={year} className="flex items-center gap-2 text-sm cursor-pointer">
+                  <input
+                    type="checkbox"
+                    className="rounded"
+                    checked={filters.year === year.toString()}
+                    onChange={(e) =>
+                      updateFilter('year', e.target.checked ? year.toString() : null)
+                    }
+                  />
+                  <span>{year}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Technologies */}
+      <div className="space-y-2">
+        <button
+          onClick={() => toggleSection('technologies')}
+          className="flex items-center justify-between w-full text-sm font-medium"
+        >
+          Technologies
+          {expandedSections.technologies ? (
+            <ChevronUp className="h-4 w-4" />
+          ) : (
+            <ChevronDown className="h-4 w-4" />
+          )}
+        </button>
+        {expandedSections.technologies && (
+          <div className="space-y-2 pl-2">
+            <Input
+              type="search"
+              placeholder="Search technologies..."
+              value={techSearch}
+              onChange={(e) => setTechSearch(e.target.value)}
+              className="h-8 text-sm"
+            />
+            <div className="space-y-2 max-h-48 overflow-y-auto">
+              {filteredTechs.slice(0, 50).map((tech) => (
+                <label key={tech.name} className="flex items-center gap-2 text-sm cursor-pointer">
+                  <input
+                    type="checkbox"
+                    className="rounded"
+                    checked={filters.tech === tech.name}
+                    onChange={(e) =>
+                      updateFilter('tech', e.target.checked ? tech.name : null)
+                    }
+                  />
+                  <span className="flex-1">{tech.name}</span>
+                  <span className="text-xs text-muted-foreground">({tech.count})</span>
+                </label>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Difficulty */}
+      <div className="space-y-2">
+        <button
+          onClick={() => toggleSection('difficulty')}
+          className="flex items-center justify-between w-full text-sm font-medium"
+        >
+          Difficulty
+          {expandedSections.difficulty ? (
+            <ChevronUp className="h-4 w-4" />
+          ) : (
+            <ChevronDown className="h-4 w-4" />
+          )}
+        </button>
+        {expandedSections.difficulty && (
+          <div className="space-y-2 pl-2">
+            {DIFFICULTY_LEVELS.map((level) => (
+              <label key={level} className="flex items-center gap-2 text-sm cursor-pointer">
                 <input
                   type="checkbox"
                   className="rounded"
-                  checked={filters.year === year.toString()}
+                  checked={filters.difficulty === level}
                   onChange={(e) =>
-                    updateFilter('year', e.target.checked ? year.toString() : null)
+                    updateFilter('difficulty', e.target.checked ? level : null)
                   }
                 />
-                <span>{year}</span>
+                <span>{level}</span>
               </label>
             ))}
-            <button className="text-sm text-muted-foreground hover:text-foreground">
-              View all
-            </button>
           </div>
         )}
       </div>
@@ -209,7 +285,7 @@ export function FiltersSidebar({ onFilterChange, initialFilters }: FiltersSideba
               onChange={(e) => setCategorySearch(e.target.value)}
               className="h-8 text-sm"
             />
-            <div className="space-y-2 max-h-64 overflow-y-auto">
+            <div className="space-y-2 max-h-48 overflow-y-auto">
               {CATEGORIES.filter((cat) =>
                 cat.toLowerCase().includes(categorySearch.toLowerCase())
               ).map((category) => (
@@ -259,47 +335,6 @@ export function FiltersSidebar({ onFilterChange, initialFilters }: FiltersSideba
           </div>
         )}
       </div>
-
-      {/* Technologies */}
-      <div className="space-y-2">
-        <button
-          onClick={() => toggleSection('technologies')}
-          className="flex items-center justify-between w-full text-sm font-medium"
-        >
-          Technologies
-          {expandedSections.technologies ? (
-            <ChevronUp className="h-4 w-4" />
-          ) : (
-            <ChevronDown className="h-4 w-4" />
-          )}
-        </button>
-        {expandedSections.technologies && (
-          <div className="space-y-2 pl-2">
-            <Input
-              type="search"
-              placeholder="Search technologies..."
-              value={techSearch}
-              onChange={(e) => setTechSearch(e.target.value)}
-              className="h-8 text-sm"
-            />
-            <div className="space-y-2 max-h-64 overflow-y-auto">
-              {filteredTechs.slice(0, 50).map((tech) => (
-                <label key={tech.name} className="flex items-center gap-2 text-sm cursor-pointer">
-                  <input
-                    type="checkbox"
-                    className="rounded"
-                    checked={filters.tech === tech.name}
-                    onChange={(e) =>
-                      updateFilter('tech', e.target.checked ? tech.name : null)
-                    }
-                  />
-                  <span className="flex-1">{tech.name}</span>
-                  <span className="text-xs text-muted-foreground">({tech.count})</span>
-                </label>
-              ))}
-            </div>
-          </div>
-        )}
       </div>
     </div>
   )
