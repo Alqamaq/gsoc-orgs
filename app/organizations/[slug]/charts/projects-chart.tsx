@@ -34,24 +34,6 @@ export function ProjectsChart({ data }: ProjectsChartProps) {
 
   const maxProjects = Math.max(...chartData.map((d) => d.projects), 1);
 
-  // Custom label renderer for bar tops
-  const renderCustomBarLabel = (props: { x?: number; y?: number; width?: number; value?: number }) => {
-    const { x = 0, y = 0, width = 0, value } = props;
-    if (!value || value === 0) return null;
-    return (
-      <text
-        x={x + width / 2}
-        y={y - 5}
-        fill="#6b7280"
-        textAnchor="middle"
-        fontSize={9}
-        fontWeight={500}
-      >
-        {value}
-      </text>
-    );
-  };
-
   return (
     <div className="h-[180px] w-full">
       <ResponsiveContainer width="100%" height="100%">
@@ -94,7 +76,10 @@ export function ProjectsChart({ data }: ProjectsChartProps) {
             <LabelList
               dataKey="projects"
               position="top"
-              content={renderCustomBarLabel}
+              fill="#6b7280"
+              fontSize={9}
+              fontWeight={500}
+              formatter={(value: number) => value > 0 ? value : ''}
             />
           </Bar>
         </BarChart>

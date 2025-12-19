@@ -244,7 +244,7 @@ export function OrganizationClient({ organization: org }: OrganizationClientProp
     return links;
   }, [org.social, org.contact]);
 
-  const websiteUrl = org.url || org.social?.blog;
+  const websiteUrl = org.social?.blog || org.contact?.guide_url;
   const githubUrl = org.social?.github;
 
   // Calculate visible technologies and topics
