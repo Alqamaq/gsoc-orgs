@@ -25,7 +25,7 @@ export const API_BASE = getBaseUrl();
  * @param path - API endpoint path (e.g., '/api/organizations')
  * @param opts - Fetch options
  */
-export async function apiFetch<T = any>(
+export async function apiFetch<T = unknown>(
   path: string,
   opts?: RequestInit
 ): Promise<T> {
@@ -48,7 +48,7 @@ export async function apiFetch<T = any>(
       // If JSON parsing fails, use statusText
     }
 
-    const error: any = new Error(errorMessage);
+    const error = new Error(errorMessage) as Error & { status: number };
     error.status = res.status;
     throw error;
   }
@@ -59,7 +59,7 @@ export async function apiFetch<T = any>(
 /**
  * Build query string from params object
  */
-export function buildQueryString(params: Record<string, any>): string {
+export function buildQueryString(params: Record<string, unknown>): string {
   const searchParams = new URLSearchParams();
   
   Object.entries(params).forEach(([key, value]) => {
@@ -84,6 +84,25 @@ export interface PaginatedResponse<T> {
   items: T[];
 }
 
+export interface OrganizationContact {
+  email?: string | null;
+  guide_url?: string | null;
+  ideas_url?: string | null;
+  irc_channel?: string | null;
+  mailing_list?: string | null;
+}
+
+export interface OrganizationSocial {
+  blog?: string | null;
+  discord?: string | null;
+  github?: string | null;
+  gitlab?: string | null;
+  medium?: string | null;
+  slack?: string | null;
+  twitter?: string | null;
+  [key: string]: unknown; // For other fields that might be Json types
+}
+
 export interface Organization {
   id: string;
   name: string;
@@ -100,10 +119,10 @@ export interface Organization {
   first_year: number;
   last_year: number;
   active_years: number[];
-  stats?: any;
-  years?: any;
-  contact?: any;
-  social?: any;
+  stats?: unknown;
+  years?: unknown;
+  contact?: OrganizationContact;
+  social?: OrganizationSocial;
 }
 
 export interface TechStack {

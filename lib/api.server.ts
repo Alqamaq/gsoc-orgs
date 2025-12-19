@@ -9,7 +9,7 @@ import { headers } from "next/headers";
  * internal server-to-server fetches must forward the request cookies; otherwise
  * Vercel returns 401 Unauthorized.
  */
-export async function apiFetchServer<T = any>(
+export async function apiFetchServer<T = unknown>(
   path: string,
   opts?: RequestInit
 ): Promise<T> {
@@ -41,7 +41,7 @@ export async function apiFetchServer<T = any>(
     } catch {
       // ignore
     }
-    const error: any = new Error(errorMessage);
+    const error = new Error(errorMessage) as Error & { status: number };
     error.status = res.status;
     throw error;
   }

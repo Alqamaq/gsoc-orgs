@@ -29,8 +29,8 @@ interface TechStackDetail {
 async function getTechStack(slug: string): Promise<TechStackDetail | null> {
   try {
     return await apiFetchServer<TechStackDetail>(`/api/tech-stack/${slug}`);
-  } catch (error: any) {
-    if (error.status === 404) {
+  } catch (error: unknown) {
+    if (error && typeof error === 'object' && 'status' in error && error.status === 404) {
       return null;
     }
     throw error;

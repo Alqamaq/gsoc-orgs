@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
+import { Prisma } from '@prisma/client'
 
 export async function GET(request: NextRequest) {
   try {
@@ -10,9 +11,12 @@ export async function GET(request: NextRequest) {
     const search = searchParams.get('q') || undefined
     const category = searchParams.get('category') || undefined
     const tech = searchParams.get('tech') || undefined
+    const year = searchParams.get('year') || undefined
+    const difficulty = searchParams.get('difficulty') || undefined
+    const topic = searchParams.get('topic') || undefined
 
     // Build where clause
-    const where: any = {}
+    const where: Prisma.organizationsWhereInput = {}
 
     if (search) {
       where.OR = [
@@ -27,6 +31,20 @@ export async function GET(request: NextRequest) {
 
     if (tech) {
       where.technologies = { has: tech }
+    }
+
+    if (year) {
+      where.active_years = { has: parseInt(year) }
+    }
+
+    if (difficulty) {
+      // Map difficulty to DB field if needed
+      // For now, we'll add it as a filter when the DB schema supports it
+      // where.difficulty = difficulty
+    }
+
+    if (topic) {
+      where.topics = { has: topic }
     }
 
     // Fetch organizations with pagination

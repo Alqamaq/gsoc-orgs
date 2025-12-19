@@ -20,8 +20,7 @@ interface Organization {
 
 // Client Component for Expandable New Orgs
 export function ExpandableNewOrgs({ 
-  organizations, 
-  year 
+  organizations
 }: { 
   organizations: Organization[]; 
   year: string;
