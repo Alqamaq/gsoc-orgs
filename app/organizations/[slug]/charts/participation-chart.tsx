@@ -8,6 +8,8 @@ import {
   Tooltip,
   ResponsiveContainer,
   CartesianGrid,
+  Cell,
+  LabelList,
 } from "recharts";
 
 interface ParticipationChartProps {
@@ -16,32 +18,12 @@ interface ParticipationChartProps {
 }
 
 export function ParticipationChart({ data, projectsData }: ParticipationChartProps) {
-  // Merge participation and projects data
-  const mergedData = data.map((d) => {
-    const projectEntry = projectsData.find((p) => p.year === d.year);
-    return {
-      year: d.year,
-      participated: d.participated,
-      projects: projectEntry?.projects || 0,
-    };
-  });
-
-  // Add years from projectsData that might not be in participation data
-  projectsData.forEach((p) => {
-    if (!mergedData.find((d) => d.year === p.year)) {
-      mergedData.push({
-        year: p.year,
-        participated: 0,
-        projects: p.projects,
-      });
-    }
-  });
-
-  // Sort by year
-  mergedData.sort((a, b) => parseInt(a.year) - parseInt(b.year));
-
-  // Take last 10 years
-  const chartData = mergedData.slice(-10);
+  // Use only projects data for this chart to match the wireframe
+  const chartData = projectsData.slice(-12).map((d, index) => ({
+    ...d,
+    // Create gradient effect - darker for more recent years
+    fill: index < 4 ? "#a5f3fc" : index < 8 ? "#67e8f9" : "#22d3ee",
+  }));
 
   if (chartData.length === 0) {
     return (
@@ -53,26 +35,45 @@ export function ParticipationChart({ data, projectsData }: ParticipationChartPro
 
   const maxProjects = Math.max(...chartData.map((d) => d.projects), 1);
 
+  // Custom label renderer for bar tops
+  const renderCustomBarLabel = (props: { x?: number; y?: number; width?: number; value?: number }) => {
+    const { x = 0, y = 0, width = 0, value } = props;
+    if (!value || value === 0) return null;
+    return (
+      <text
+        x={x + width / 2}
+        y={y - 5}
+        fill="#6b7280"
+        textAnchor="middle"
+        fontSize={9}
+        fontWeight={500}
+      >
+        {value}
+      </text>
+    );
+  };
+
   return (
     <div className="h-[180px] w-full">
       <ResponsiveContainer width="100%" height="100%">
-        <BarChart data={chartData} margin={{ top: 5, right: 5, left: -20, bottom: 5 }}>
+        <BarChart data={chartData} margin={{ top: 20, right: 5, left: -25, bottom: 5 }}>
           <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" />
           <XAxis
             dataKey="year"
-            tick={{ fontSize: 10, fill: "#6b7280" }}
+            tick={{ fontSize: 9, fill: "#6b7280" }}
             tickLine={false}
             axisLine={false}
             interval={0}
             angle={-45}
             textAnchor="end"
-            height={40}
+            height={35}
           />
           <YAxis
-            tick={{ fontSize: 10, fill: "#6b7280" }}
+            tick={{ fontSize: 9, fill: "#6b7280" }}
             tickLine={false}
             axisLine={false}
-            domain={[0, maxProjects + 2]}
+            domain={[0, maxProjects + 5]}
+            tickCount={5}
           />
           <Tooltip
             contentStyle={{
@@ -81,26 +82,24 @@ export function ParticipationChart({ data, projectsData }: ParticipationChartPro
               borderRadius: "8px",
               fontSize: "12px",
             }}
-            formatter={(value: number, name: string) => [
-              value,
-              name === "projects" ? "Projects" : "Participated",
-            ]}
+            formatter={(value: number) => [value, "Projects"]}
           />
           <Bar
             dataKey="projects"
-            fill="#7dd3fc"
             radius={[4, 4, 0, 0]}
-            maxBarSize={30}
-          />
-          <Bar
-            dataKey="participated"
-            fill="#0ea5e9"
-            radius={[4, 4, 0, 0]}
-            maxBarSize={30}
-          />
+            maxBarSize={28}
+          >
+            {chartData.map((entry, index) => (
+              <Cell key={`cell-${index}`} fill={entry.fill} />
+            ))}
+            <LabelList
+              dataKey="projects"
+              position="top"
+              content={renderCustomBarLabel}
+            />
+          </Bar>
         </BarChart>
       </ResponsiveContainer>
     </div>
   );
 }
-

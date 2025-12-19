@@ -14,6 +14,11 @@ import {
   TrendingUp,
   Search,
   ChevronRight,
+  ChevronLeft,
+  ChevronDown,
+  ChevronUp,
+  Code,
+  Eye,
 } from "lucide-react";
 import {
   Heading,
@@ -78,6 +83,27 @@ const socialIcons: Record<string, React.ElementType> = {
   github: Github,
 };
 
+// Technology icons mapping
+const getTechIcon = (tech: string) => {
+  const techLower = tech.toLowerCase();
+  if (techLower.includes('python')) return '🐍';
+  if (techLower.includes('javascript') || techLower.includes('js')) return '🟨';
+  if (techLower.includes('typescript') || techLower.includes('ts')) return '🔷';
+  if (techLower.includes('java') && !techLower.includes('script')) return '☕';
+  if (techLower.includes('c++') || techLower.includes('cpp')) return '⚙️';
+  if (techLower.includes('rust')) return '🦀';
+  if (techLower.includes('go') || techLower === 'golang') return '🐹';
+  if (techLower.includes('ruby')) return '💎';
+  if (techLower.includes('php')) return '🐘';
+  if (techLower.includes('swift')) return '🍎';
+  if (techLower.includes('kotlin')) return '🟣';
+  if (techLower.includes('react')) return '⚛️';
+  if (techLower.includes('node')) return '🟢';
+  if (techLower.includes('docker')) return '🐳';
+  if (techLower.includes('kubernetes') || techLower.includes('k8s')) return '☸️';
+  return '📦';
+};
+
 export function OrganizationClient({ organization: org }: OrganizationClientProps) {
   // Get available years from organization data, sorted descending
   const availableYears = useMemo(() => {
@@ -85,6 +111,13 @@ export function OrganizationClient({ organization: org }: OrganizationClientProp
   }, [org.active_years]);
 
   const [selectedYear, setSelectedYear] = useState<number>(availableYears[0] || 2025);
+  const [yearStartIndex, setYearStartIndex] = useState(0);
+  const [showAllTechnologies, setShowAllTechnologies] = useState(false);
+  const [showAllTopics, setShowAllTopics] = useState(false);
+
+  const VISIBLE_YEARS = 8;
+  const ITEMS_PER_ROW = 6; // Approximate items per row
+  const VISIBLE_ROWS = 2;
 
   // Get projects for selected year
   const yearProjects = useMemo(() => {
@@ -188,7 +221,7 @@ export function OrganizationClient({ organization: org }: OrganizationClientProp
     ];
   }, [org.years]);
 
-  // Social/Communication links
+  // Social/Communication links - only include present ones
   const socialLinks = useMemo(() => {
     const links: Array<{ name: string; url: string; icon: React.ElementType }> = [];
     
@@ -211,8 +244,19 @@ export function OrganizationClient({ organization: org }: OrganizationClientProp
     return links;
   }, [org.social, org.contact]);
 
-  const websiteUrl = org.social?.blog || org.contact?.guide_url;
+  const websiteUrl = org.url || org.social?.blog;
   const githubUrl = org.social?.github;
+
+  // Calculate visible technologies and topics
+  const maxVisibleTech = ITEMS_PER_ROW * VISIBLE_ROWS;
+  const maxVisibleTopics = ITEMS_PER_ROW * VISIBLE_ROWS;
+  const visibleTechnologies = showAllTechnologies ? org.technologies : org.technologies.slice(0, maxVisibleTech);
+  const visibleTopics = showAllTopics ? (org.topics || []) : (org.topics || []).slice(0, maxVisibleTopics);
+
+  // Year navigation
+  const visibleYears = availableYears.slice(yearStartIndex, yearStartIndex + VISIBLE_YEARS);
+  const canGoPrev = yearStartIndex > 0;
+  const canGoNext = yearStartIndex + VISIBLE_YEARS < availableYears.length;
 
   return (
     <div className="min-h-screen">
@@ -245,19 +289,16 @@ export function OrganizationClient({ organization: org }: OrganizationClientProp
                     <Heading as="h1" variant="section" className="text-3xl md:text-4xl mb-2">
                       {org.name}
                     </Heading>
-                    <Text variant="muted" className="italic">
-                      {org.description?.split('.')[0] || 'Open source organization'}
-                    </Text>
                   </div>
                   
-                  <Text className="text-foreground/80 line-clamp-3">
+                  <Text className="text-foreground/80 line-clamp-4">
                     {org.description}
                   </Text>
 
                   {/* Separator */}
                   <div className="border-b border-foreground/20 pt-2" />
 
-                  {/* Primary Links */}
+                  {/* Primary Links - conditionally render */}
                   <div className="flex flex-wrap gap-3 pt-2">
                     {websiteUrl && (
                       <Button variant="outline" size="sm" asChild>
@@ -287,7 +328,7 @@ export function OrganizationClient({ organization: org }: OrganizationClientProp
                     )}
                   </div>
 
-                  {/* Social Tags */}
+                  {/* Social Tags - only render if there are links */}
                   {socialLinks.length > 0 && (
                     <div className="flex flex-wrap gap-2">
                       {socialLinks.map((link) => (
@@ -332,14 +373,14 @@ export function OrganizationClient({ organization: org }: OrganizationClientProp
               </div>
             </section>
 
-            {/* Technologies */}
+            {/* Technologies with Show More */}
             {org.technologies && org.technologies.length > 0 && (
               <section className="space-y-4">
                 <Heading variant="small" className="text-lg">
                   Technologies
                 </Heading>
                 <div className="flex flex-wrap gap-2">
-                  {org.technologies.map((tech) => (
+                  {visibleTechnologies.map((tech) => (
                     <Link href={`/tech-stack/${encodeURIComponent(tech.toLowerCase())}`} key={tech}>
                       <Badge 
                         variant="secondary" 
@@ -350,17 +391,33 @@ export function OrganizationClient({ organization: org }: OrganizationClientProp
                     </Link>
                   ))}
                 </div>
+                {org.technologies.length > maxVisibleTech && (
+                  <button
+                    onClick={() => setShowAllTechnologies(!showAllTechnologies)}
+                    className="inline-flex items-center gap-1 text-sm text-primary hover:text-primary/80 font-medium transition-colors"
+                  >
+                    {showAllTechnologies ? (
+                      <>
+                        Show less <ChevronUp className="w-4 h-4" />
+                      </>
+                    ) : (
+                      <>
+                        Show more ({org.technologies.length - maxVisibleTech} more) <ChevronDown className="w-4 h-4" />
+                      </>
+                    )}
+                  </button>
+                )}
               </section>
             )}
 
-            {/* Topics */}
+            {/* Topics with Show More */}
             {org.topics && org.topics.length > 0 && (
               <section className="space-y-4">
                 <Heading variant="small" className="text-lg">
                   Topics
                 </Heading>
                 <div className="flex flex-wrap gap-2">
-                  {org.topics.map((topic) => (
+                  {visibleTopics.map((topic) => (
                     <Link href={`/topics/${encodeURIComponent(topic.toLowerCase().replace(/\s+/g, '-'))}`} key={topic}>
                       <Badge 
                         variant="outline" 
@@ -371,37 +428,75 @@ export function OrganizationClient({ organization: org }: OrganizationClientProp
                     </Link>
                   ))}
                 </div>
+                {(org.topics?.length || 0) > maxVisibleTopics && (
+                  <button
+                    onClick={() => setShowAllTopics(!showAllTopics)}
+                    className="inline-flex items-center gap-1 text-sm text-primary hover:text-primary/80 font-medium transition-colors"
+                  >
+                    {showAllTopics ? (
+                      <>
+                        Show less <ChevronUp className="w-4 h-4" />
+                      </>
+                    ) : (
+                      <>
+                        Show more ({(org.topics?.length || 0) - maxVisibleTopics} more) <ChevronDown className="w-4 h-4" />
+                      </>
+                    )}
+                  </button>
+                )}
               </section>
             )}
 
             {/* Past Projects */}
             <section className="space-y-6">
-              <Heading variant="small" className="text-lg">
+              <Heading variant="small" className="text-lg text-center">
                 Past Projects
               </Heading>
               
-              {/* Year Tabs */}
-              <div className="flex flex-wrap gap-2 border-b pb-4">
-                {availableYears.slice(0, 9).map((year) => (
+              {/* Year Tabs with Arrow Navigation */}
+              <div className="flex items-center justify-center gap-2">
+                {canGoPrev && (
                   <button
-                    key={year}
-                    onClick={() => setSelectedYear(year)}
-                    className={cn(
-                      "px-4 py-2 text-sm font-medium rounded-md transition-colors",
-                      selectedYear === year
-                        ? "bg-primary text-primary-foreground"
-                        : "bg-muted hover:bg-muted/80 text-muted-foreground"
-                    )}
+                    onClick={() => setYearStartIndex(prev => Math.max(0, prev - 1))}
+                    className="p-2 rounded-md hover:bg-muted transition-colors"
+                    aria-label="Previous years"
                   >
-                    {year}
+                    <ChevronLeft className="w-5 h-5" />
                   </button>
-                ))}
+                )}
+                
+                <div className="flex flex-wrap gap-2 justify-center border-b pb-4">
+                  {visibleYears.map((year) => (
+                    <button
+                      key={year}
+                      onClick={() => setSelectedYear(year)}
+                      className={cn(
+                        "px-4 py-2 text-sm font-medium rounded-md transition-colors",
+                        selectedYear === year
+                          ? "bg-primary text-primary-foreground"
+                          : "bg-muted hover:bg-muted/80 text-muted-foreground"
+                      )}
+                    >
+                      {year}
+                    </button>
+                  ))}
+                </div>
+
+                {canGoNext && (
+                  <button
+                    onClick={() => setYearStartIndex(prev => Math.min(availableYears.length - VISIBLE_YEARS, prev + 1))}
+                    className="p-2 rounded-md hover:bg-muted transition-colors"
+                    aria-label="Next years"
+                  >
+                    <ChevronRight className="w-5 h-5" />
+                  </button>
+                )}
               </div>
 
-              {/* Project Cards Grid */}
+              {/* Project Cards Grid - Show ALL projects */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {yearProjects.length > 0 ? (
-                  yearProjects.slice(0, 8).map((project, index) => (
+                  yearProjects.map((project, index) => (
                     <ProjectCard
                       key={project.id || index}
                       project={project}
@@ -414,15 +509,6 @@ export function OrganizationClient({ organization: org }: OrganizationClientProp
                   </div>
                 )}
               </div>
-
-              {yearProjects.length > 8 && (
-                <div className="text-center">
-                  <Button variant="outline">
-                    View All {yearProjects.length} Projects
-                    <ChevronRight className="w-4 h-4" />
-                  </Button>
-                </div>
-              )}
             </section>
 
             {/* FAQ Section */}
@@ -498,7 +584,7 @@ export function OrganizationClient({ organization: org }: OrganizationClientProp
                 <div className="flex items-center gap-2 text-xs text-muted-foreground">
                   <span className="flex items-center gap-1">
                     <span className="w-2 h-2 rounded-full bg-sky-500" />
-                    Years
+                    Starters
                   </span>
                   <span className="flex items-center gap-1">
                     <span className="w-2 h-2 rounded-full bg-sky-300" />
@@ -536,15 +622,12 @@ export function OrganizationClient({ organization: org }: OrganizationClientProp
                 <Heading variant="small" className="text-base">
                   Top Programming Languages
                 </Heading>
-                <Text variant="small" className="text-muted-foreground">
-                  Most commonly used languages across organizations
-                </Text>
+                <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1">
+                  <TrendingUp className="w-3 h-3" />
+                  <span className="font-medium">{org.technologies[0]}</span> dominates with primary adoption
+                </div>
               </div>
               <LanguagesChart data={languagesData} />
-              <div className="mt-4 flex items-center gap-2 text-xs text-muted-foreground">
-                <TrendingUp className="w-3 h-3" />
-                <span className="font-medium">{org.technologies[0]}</span> dominates with primary adoption
-              </div>
             </CardWrapper>
 
             {/* Project Difficulty Distribution */}
@@ -561,46 +644,133 @@ export function OrganizationClient({ organization: org }: OrganizationClientProp
   );
 }
 
-// Project Card Component
+// Project Card Component - Updated to match wireframe
 interface ProjectCardProps {
   project: {
     id: string;
     title: string;
     short_description: string;
+    description?: string;
     student_name: string;
     difficulty?: string;
+    tags?: string[];
     slug: string;
+    code_url?: string;
     project_url: string;
   };
   orgSlug: string;
 }
 
 function ProjectCard({ project, orgSlug }: ProjectCardProps) {
+  const getDifficultyColor = (difficulty?: string) => {
+    switch (difficulty?.toLowerCase()) {
+      case 'beginner':
+      case 'easy':
+        return 'bg-emerald-500';
+      case 'intermediate':
+      case 'medium':
+        return 'bg-amber-500';
+      case 'advanced':
+      case 'hard':
+        return 'bg-orange-600';
+      default:
+        return 'bg-gray-400';
+    }
+  };
+
+  // Extract technologies and topics from tags
+  const technologies = project.tags?.filter(tag => 
+    ['python', 'javascript', 'java', 'c++', 'typescript', 'rust', 'go', 'ruby', 'php', 'swift', 'kotlin', 'react', 'node', 'docker', 'loki'].some(t => tag.toLowerCase().includes(t))
+  ) || [];
+  
+  const topics = project.tags?.filter(tag => 
+    !technologies.includes(tag)
+  ).slice(0, 5) || [];
+
   return (
-    <CardWrapper padding="md" hover className="flex flex-col">
-      <div className="flex-1 space-y-2">
-        <Heading variant="small" className="text-base line-clamp-2">
+    <CardWrapper padding="md" hover className="flex flex-col relative">
+      {/* Difficulty Badge */}
+      {project.difficulty && (
+        <div className="absolute top-4 left-4 flex items-center gap-2">
+          <span className={cn("w-2.5 h-2.5 rounded-full", getDifficultyColor(project.difficulty))} />
+          <span className="text-xs font-medium text-muted-foreground capitalize">
+            {project.difficulty}
+          </span>
+        </div>
+      )}
+
+      <div className="flex-1 space-y-3 pt-6">
+        {/* Title */}
+        <Heading variant="small" className="text-base line-clamp-2 font-semibold">
           {project.title}
         </Heading>
-        <Text variant="small" className="text-muted-foreground">
-          {project.student_name}
-        </Text>
+
+        {/* Contributor */}
+        <div className="text-xs text-muted-foreground">
+          <span className="font-medium">Contributor :</span>
+        </div>
+        
+        {/* Mentor placeholder */}
+        <div className="text-xs text-muted-foreground">
+          <span className="font-medium">Mentor :</span> {project.student_name || 'XYZ'}
+        </div>
+
+        {/* Description */}
         <Text variant="small" className="line-clamp-3 text-foreground/70">
-          {project.short_description}
+          {project.short_description || project.description}
         </Text>
+
+        {/* Technologies */}
+        {technologies.length > 0 && (
+          <div className="flex flex-wrap items-center gap-2">
+            {technologies.slice(0, 3).map((tech, idx) => (
+              <span key={idx} className="inline-flex items-center gap-1 px-2 py-1 text-xs bg-muted rounded-md">
+                {getTechIcon(tech)} {tech}
+              </span>
+            ))}
+          </div>
+        )}
+
+        {/* Topics */}
+        {topics.length > 0 && (
+          <div className="flex flex-wrap items-center gap-1.5">
+            <span className="text-xs text-muted-foreground">Topics:</span>
+            {topics.map((topic, idx) => (
+              <span key={idx} className="text-xs px-2 py-0.5 border rounded-md">
+                {topic}
+              </span>
+            ))}
+          </div>
+        )}
       </div>
-      <div className="pt-4 mt-auto">
-        <Button variant="outline" size="sm" asChild className="w-full">
+
+      {/* Action Buttons */}
+      <div className="pt-4 mt-auto flex gap-2">
+        <Button variant="default" size="sm" asChild className="flex-1 bg-teal-600 hover:bg-teal-700">
           <a
             href={project.project_url}
             target="_blank"
             rel="noopener noreferrer"
+            className="flex items-center justify-center gap-2"
           >
-            More Details
+            <Eye className="w-4 h-4" />
+            View Project
           </a>
         </Button>
+        {project.code_url && (
+          <Button variant="outline" size="sm" asChild className="flex-1">
+            <a
+              href={project.code_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-center gap-2"
+            >
+              <Code className="w-4 h-4" />
+              View Code
+            </a>
+          </Button>
+        )}
       </div>
     </CardWrapper>
   );
 }
-
