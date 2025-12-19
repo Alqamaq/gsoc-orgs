@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
-import { Search, TrendingUp, BarChart3, Users, Code, Calendar, ArrowUpDown } from "lucide-react";
+import Image from "next/image";
+import { Search, TrendingUp, BarChart3, Users, Code, ArrowUpDown } from "lucide-react";
 import {
   Heading,
   Text,
@@ -427,9 +428,11 @@ function OrganizationCard({ org }: {
         <div className="flex items-start gap-4 mb-3">
           <div className="w-12 h-12 rounded-lg bg-muted flex items-center justify-center overflow-hidden shrink-0">
             {logoUrl ? (
-              <img
+              <Image
                 src={logoUrl}
                 alt={`${org.name} logo`}
+                width={48}
+                height={48}
                 className="w-full h-full object-contain"
               />
             ) : (
