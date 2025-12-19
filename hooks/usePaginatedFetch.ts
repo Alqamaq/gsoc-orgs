@@ -15,7 +15,7 @@ interface UsePaginatedFetchOptions<T> {
   /** Items per page (default: 20) */
   pageSize?: number;
   /** Dependencies that trigger refetch */
-  dependencies?: any[];
+  dependencies?: unknown[];
 }
 
 interface UsePaginatedFetchReturn<T> {

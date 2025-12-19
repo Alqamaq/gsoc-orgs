@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
+import { Prisma } from '@prisma/client'
 
 /**
  * GET /api/v1/tech-stack
@@ -19,7 +20,7 @@ export async function GET(request: NextRequest) {
     const minUsage = Number(searchParams.get('min_usage')) || 1
 
     // Build where clause
-    const where: any = {}
+    const where: Prisma.organizationsWhereInput = {}
 
     if (search) {
       where.name = { contains: search, mode: 'insensitive' }

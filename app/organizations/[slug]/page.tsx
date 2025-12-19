@@ -7,7 +7,6 @@ import {
   Badge,
   Button,
   CardWrapper,
-  Grid,
 } from "@/components/ui";
 import { Organization } from "@/lib/api";
 import { apiFetchServer } from "@/lib/api.server";
@@ -20,8 +19,8 @@ import { apiFetchServer } from "@/lib/api.server";
 async function getOrganization(slug: string): Promise<Organization | null> {
   try {
     return await apiFetchServer<Organization>(`/api/organizations/${slug}`);
-  } catch (error: any) {
-    if (error.status === 404) {
+  } catch (error: unknown) {
+    if (error && typeof error === 'object' && 'status' in error && error.status === 404) {
       return null;
     }
     throw error;

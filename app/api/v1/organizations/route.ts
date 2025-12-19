@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
+import { Prisma } from '@prisma/client'
 
 /**
  * GET /api/v1/organizations
@@ -28,7 +29,7 @@ export async function GET(request: NextRequest) {
     const sort = searchParams.get('sort') || 'name'
 
     // Build where clause
-    const where: any = {}
+    const where: Prisma.organizationsWhereInput = {}
 
     if (search) {
       where.OR = [
@@ -54,7 +55,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Build order by
-    let orderBy: any = { name: 'asc' }
+    let orderBy: Prisma.organizationsOrderByWithRelationInput = { name: 'asc' }
     if (sort === 'projects') {
       orderBy = { total_projects: 'desc' }
     } else if (sort === 'year') {

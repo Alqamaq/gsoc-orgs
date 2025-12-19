@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
+import { Prisma } from '@prisma/client'
 
 /**
  * GET /api/v1/projects
@@ -22,7 +23,7 @@ export async function GET(request: NextRequest) {
     const orgSlug = searchParams.get('org') || undefined
 
     // Build where clause
-    const where: any = {}
+    const where: Prisma.projectsWhereInput = {}
 
     if (search) {
       where.OR = [

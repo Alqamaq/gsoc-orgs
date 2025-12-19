@@ -25,7 +25,7 @@ export const API_BASE = getBaseUrl();
  * @param path - API endpoint path (e.g., '/api/organizations')
  * @param opts - Fetch options
  */
-export async function apiFetch<T = any>(
+export async function apiFetch<T = unknown>(
   path: string,
   opts?: RequestInit
 ): Promise<T> {
@@ -48,7 +48,7 @@ export async function apiFetch<T = any>(
       // If JSON parsing fails, use statusText
     }
 
-    const error: any = new Error(errorMessage);
+    const error = new Error(errorMessage) as Error & { status: number };
     error.status = res.status;
     throw error;
   }
@@ -59,7 +59,7 @@ export async function apiFetch<T = any>(
 /**
  * Build query string from params object
  */
-export function buildQueryString(params: Record<string, any>): string {
+export function buildQueryString(params: Record<string, unknown>): string {
   const searchParams = new URLSearchParams();
   
   Object.entries(params).forEach(([key, value]) => {
@@ -100,10 +100,10 @@ export interface Organization {
   first_year: number;
   last_year: number;
   active_years: number[];
-  stats?: any;
-  years?: any;
-  contact?: any;
-  social?: any;
+  stats?: unknown;
+  years?: unknown;
+  contact?: unknown;
+  social?: unknown;
 }
 
 export interface TechStack {

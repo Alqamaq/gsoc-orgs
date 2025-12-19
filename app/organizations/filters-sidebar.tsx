@@ -53,7 +53,7 @@ export function FiltersSidebar({ onFilterChange, initialFilters }: FiltersSideba
     }
   )
 
-  const [sidebarSearch, setSidebarSearch] = useState('')
+  const [sidebarSearch] = useState('')
   const [expandedSections, setExpandedSections] = useState({
     firstTime: true,
     years: true,
