@@ -127,7 +127,7 @@ export function FiltersSidebar({ onFilterChange, initialFilters }: FiltersSideba
   const visibleTechs = showAllTechs ? filteredTechs : filteredTechs.slice(0, 10)
 
   return (
-    <div className="p-4 bg-white h-full">
+    <div className="rounded-xl border border-gray-200 bg-white p-4 overflow-y-auto">
       {/* Header */}
       <div className="flex items-center justify-between mb-3">
         <h3 className="text-base font-semibold text-gray-900">Filters</h3>
