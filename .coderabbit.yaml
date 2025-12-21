@@ -1,39 +1,23 @@
+version: 1
+
 reviews:
   auto_review:
     enabled: true
 
-  review_status: true
+    # Run on all PRs to any branch
+    branches:
+      include:
+        - "*"
 
-  high_level_summary: true
+  # Remove "Review skipped" noise
+  review_status: false
 
-  collapse_walkthrough: false
+  # Optional: review even draft PRs
+  drafts: true
 
-  auto_title:
-    enabled: true
-
-  auto_description:
-    enabled: true
-
-  path_filters:
-    exclude:
-      - "**/*.lock"
-      - "**/*.png"
-      - "**/*.jpg"
-      - "**/*.svg"
-      - "**/*.webp"
-      - "**/node_modules/**"
-      - "**/.next/**"
-      - "**/dist/**"
-
-language_settings:
-  typescript:
-    enabled: true
+# Optional but recommended
+language:
   javascript:
     enabled: true
-
-tone:
-  style: concise
-  severity: balanced
-
-comments:
-  max_comments: 25
+  typescript:
+    enabled: true
