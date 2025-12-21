@@ -326,6 +326,7 @@ export function OrganizationClient({ organization: org }: OrganizationClientProp
                   <Link
                     key={year}
                     href={`/gsoc-${year}-organizations`}
+                    prefetch={true}
                   >
                     <Badge
                       variant="outline"

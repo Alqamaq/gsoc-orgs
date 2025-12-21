@@ -5,7 +5,7 @@ import { Search, ChevronDown, ChevronUp } from 'lucide-react'
 
 interface FiltersSidebarProps {
   onFilterChange: (filters: FilterState) => void
-  initialFilters?: FilterState
+  filters: FilterState
 }
 
 export interface FilterState {
@@ -41,17 +41,7 @@ const TOPICS = [
   'Database',
 ]
 
-export function FiltersSidebar({ onFilterChange, initialFilters }: FiltersSidebarProps) {
-  const [filters, setFilters] = useState<FilterState>(
-    initialFilters || {
-      search: '',
-      year: null,
-      category: null,
-      tech: null,
-      topic: null,
-      difficulties: [],
-    }
-  )
+export function FiltersSidebar({ onFilterChange, filters }: FiltersSidebarProps) {
 
   const [sidebarSearch] = useState('')
   const [expandedSections, setExpandedSections] = useState({
@@ -83,7 +73,6 @@ export function FiltersSidebar({ onFilterChange, initialFilters }: FiltersSideba
 
   const updateFilter = (key: keyof FilterState, value: string | null) => {
     const newFilters = { ...filters, [key]: value }
-    setFilters(newFilters)
     onFilterChange(newFilters)
   }
 
@@ -96,7 +85,6 @@ export function FiltersSidebar({ onFilterChange, initialFilters }: FiltersSideba
       topic: null,
       difficulties: [],
     }
-    setFilters(clearedFilters)
     onFilterChange(clearedFilters)
   }
 
