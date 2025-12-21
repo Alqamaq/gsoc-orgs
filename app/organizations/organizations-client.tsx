@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
+import { useState, useEffect, useCallback, useMemo, useRef, startTransition } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Search, X } from 'lucide-react'
 import { Button, Input, SectionHeader } from '@/components/ui'
@@ -189,7 +189,10 @@ export function OrganizationsClient({ initialData, initialPage }: OrganizationsC
     const currentUrl = window.location.pathname + window.location.search
     if (currentUrl === url) return
     
-    router.push(url, { scroll: false })
+    // Use startTransition to keep UI responsive during navigation
+    startTransition(() => {
+      router.push(url, { scroll: false })
+    })
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }, [currentPage, filters, isLoading, router])
 
@@ -219,10 +222,12 @@ export function OrganizationsClient({ initialData, initialPage }: OrganizationsC
     
     const newUrl = `/organizations?${params.toString()}`
     
-    // Update state and navigate - use startTransition to prevent blocking
+    // Update state and navigate - use startTransition to keep UI responsive
     setFilters(newFilters)
-    // Use startTransition to make navigation non-blocking
-    router.push(newUrl, { scroll: false })
+    // Use startTransition to make navigation non-blocking (especially helpful on low-end devices)
+    startTransition(() => {
+      router.push(newUrl, { scroll: false })
+    })
   }, [filters, router])
 
   const removeFilter = useCallback((key: keyof FilterState) => {
