@@ -1,0 +1,39 @@
+reviews:
+  auto_review:
+    enabled: true
+
+  review_status: true
+
+  high_level_summary: true
+
+  collapse_walkthrough: false
+
+  auto_title:
+    enabled: true
+
+  auto_description:
+    enabled: true
+
+  path_filters:
+    exclude:
+      - "**/*.lock"
+      - "**/*.png"
+      - "**/*.jpg"
+      - "**/*.svg"
+      - "**/*.webp"
+      - "**/node_modules/**"
+      - "**/.next/**"
+      - "**/dist/**"
+
+language_settings:
+  typescript:
+    enabled: true
+  javascript:
+    enabled: true
+
+tone:
+  style: concise
+  severity: balanced
+
+comments:
+  max_comments: 25
