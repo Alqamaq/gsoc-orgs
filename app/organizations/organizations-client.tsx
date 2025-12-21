@@ -1,12 +1,29 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useMemo, useRef, startTransition } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Search, X } from 'lucide-react'
 import { Button, Input, SectionHeader } from '@/components/ui'
 import { Organization, PaginatedResponse } from '@/lib/api'
 import { OrganizationCard } from '@/components/organization-card'
 import { FiltersSidebar, FilterState } from './filters-sidebar'
+
+// Debounce utility
+function useDebounce<T>(value: T, delay: number): T {
+  const [debouncedValue, setDebouncedValue] = useState<T>(value)
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedValue(value)
+    }, delay)
+
+    return () => {
+      clearTimeout(handler)
+    }
+  }, [value, delay])
+
+  return debouncedValue
+}
 
 interface OrganizationsClientProps {
   initialData: PaginatedResponse<Organization>
@@ -19,51 +36,138 @@ export function OrganizationsClient({ initialData, initialPage }: OrganizationsC
   const [data, setData] = useState<PaginatedResponse<Organization>>(initialData)
   const [isLoading, setIsLoading] = useState(false)
   const [currentPage, setCurrentPage] = useState(initialPage)
+  const isInitialMount = useRef(true)
+  const lastFetchParams = useRef<string>('')
+  const lastUrlString = useRef<string>('')
   
-  const [filters, setFilters] = useState<FilterState>({
-    search: searchParams.get('q') || '',
-    year: searchParams.get('year') || null,
-    category: searchParams.get('category') || null,
-    tech: searchParams.get('tech') || null,
-    topic: searchParams.get('topic') || null,
-    difficulties: searchParams.get('difficulties')?.split(',').filter(Boolean) || [],
-  })
+  // Parse searchParams once into primitive values to avoid object recreation
+  // This prevents useSearchParams() from causing unnecessary re-renders
+  const urlSearch = searchParams.get('q') || ''
+  const urlYear = searchParams.get('year') || null
+  const urlCategory = searchParams.get('category') || null
+  const urlTech = searchParams.get('tech') || null
+  const urlTopic = searchParams.get('topic') || null
+  const urlDifficulties = searchParams.get('difficulties') || ''
+  
+  // Memoize filters from URL using primitives to avoid unnecessary recalculations
+  const urlFilters = useMemo<FilterState>(() => ({
+    search: urlSearch,
+    year: urlYear,
+    category: urlCategory,
+    tech: urlTech,
+    topic: urlTopic,
+    difficulties: urlDifficulties ? urlDifficulties.split(',').filter(Boolean) : [],
+  }), [urlSearch, urlYear, urlCategory, urlTech, urlTopic, urlDifficulties])
+  
+  const [filters, setFilters] = useState<FilterState>(urlFilters)
+  const [searchInput, setSearchInput] = useState(urlFilters.search)
+  
+  // Debounce search input to avoid excessive navigation
+  const debouncedSearch = useDebounce(searchInput, 300)
 
+  // Sync filters from URL only when URL actually changes (not on every render)
+  // Use URL string comparison instead of object comparison
   useEffect(() => {
-    const newFilters: FilterState = {
-      search: searchParams.get('q') || '',
-      year: searchParams.get('year') || null,
-      category: searchParams.get('category') || null,
-      tech: searchParams.get('tech') || null,
-      topic: searchParams.get('topic') || null,
-      difficulties: searchParams.get('difficulties')?.split(',').filter(Boolean) || [],
+    const currentUrlString = searchParams.toString()
+    
+    if (isInitialMount.current) {
+      isInitialMount.current = false
+      lastUrlString.current = currentUrlString
+      setSearchInput(urlFilters.search)
+      return
     }
+    
+    // Only update if URL actually changed
+    if (currentUrlString === lastUrlString.current) {
+      return
+    }
+    
+    lastUrlString.current = currentUrlString
+    
+    // Only update if filters actually changed
+    const filtersChanged = 
+      filters.search !== urlFilters.search ||
+      filters.year !== urlFilters.year ||
+      filters.category !== urlFilters.category ||
+      filters.tech !== urlFilters.tech ||
+      filters.topic !== urlFilters.topic ||
+      JSON.stringify(filters.difficulties) !== JSON.stringify(urlFilters.difficulties)
+    
+    if (filtersChanged) {
+      setFilters(urlFilters)
+      setSearchInput(urlFilters.search)
+    }
+  }, [urlSearch, urlYear, urlCategory, urlTech, urlTopic, urlDifficulties, filters, urlFilters])
+  
+  // handleFilterChange must be declared before useEffect that uses it
+  const handleFilterChange = useCallback((newFilters: FilterState) => {
+    // Prevent unnecessary updates if filters haven't changed
+    const filtersChanged = 
+      filters.search !== newFilters.search ||
+      filters.year !== newFilters.year ||
+      filters.category !== newFilters.category ||
+      filters.tech !== newFilters.tech ||
+      filters.topic !== newFilters.topic ||
+      JSON.stringify(filters.difficulties) !== JSON.stringify(newFilters.difficulties)
+    
+    if (!filtersChanged) return
+    
+    // Build URL params first
+    const params = new URLSearchParams()
+    // Reset to page 1 when filters change
+    if (newFilters.search) params.set('q', newFilters.search)
+    if (newFilters.category) params.set('category', newFilters.category)
+    if (newFilters.tech) params.set('tech', newFilters.tech)
+    if (newFilters.year) params.set('year', newFilters.year)
+    if (newFilters.topic) params.set('topic', newFilters.topic)
+    if (newFilters.difficulties.length > 0) {
+      params.set('difficulties', newFilters.difficulties.join(','))
+    }
+    
+    const newUrl = `/organizations?${params.toString()}`
+    
+    // Update state and navigate - use startTransition to keep UI responsive
     setFilters(newFilters)
-  }, [searchParams])
-
+    // Use startTransition to make navigation non-blocking (especially helpful on low-end devices)
+    startTransition(() => {
+      router.push(newUrl, { scroll: false })
+    })
+  }, [filters, router])
+  
+  // Handle debounced search input
   useEffect(() => {
-    const page = Number(searchParams.get('page')) || 1
-    if (page !== currentPage) {
-      setCurrentPage(page)
-      fetchOrganizations(page)
+    if (isInitialMount.current) return
+    
+    if (debouncedSearch !== filters.search) {
+      handleFilterChange({ ...filters, search: debouncedSearch })
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchParams])
+  }, [debouncedSearch, filters, handleFilterChange])
 
-  const fetchOrganizations = useCallback(async (page: number) => {
+  // Memoize fetch function to avoid recreating on every render
+  const fetchOrganizations = useCallback(async (page: number, filterState: FilterState) => {
     setIsLoading(true)
     try {
       const params = new URLSearchParams()
       params.set('page', page.toString())
       params.set('limit', '20')
-      if (filters.search) params.set('q', filters.search)
-      if (filters.category) params.set('category', filters.category)
-      if (filters.tech) params.set('tech', filters.tech)
-      if (filters.year) params.set('year', filters.year)
-      if (filters.difficulties.length > 0) params.set('difficulties', filters.difficulties.join(','))
-      if (filters.topic) params.set('topic', filters.topic)
+      if (filterState.search) params.set('q', filterState.search)
+      if (filterState.category) params.set('category', filterState.category)
+      if (filterState.tech) params.set('tech', filterState.tech)
+      if (filterState.year) params.set('year', filterState.year)
+      if (filterState.difficulties.length > 0) params.set('difficulties', filterState.difficulties.join(','))
+      if (filterState.topic) params.set('topic', filterState.topic)
       
-      const response = await fetch(`/api/organizations?${params.toString()}`)
+      const paramsString = params.toString()
+      
+      // Prevent duplicate fetches with same parameters
+      if (lastFetchParams.current === paramsString) {
+        setIsLoading(false)
+        return
+      }
+      
+      lastFetchParams.current = paramsString
+      
+      const response = await fetch(`/api/organizations?${paramsString}`)
       const newData = await response.json()
       setData(newData)
     } catch (error) {
@@ -71,43 +175,65 @@ export function OrganizationsClient({ initialData, initialPage }: OrganizationsC
     } finally {
       setIsLoading(false)
     }
-  }, [filters])
+  }, [])
 
+  // Handle page changes from URL
   useEffect(() => {
-    fetchOrganizations(1)
-    setCurrentPage(1)
-  }, [filters, fetchOrganizations])
-
-  const handlePageChange = (page: number) => {
-    updateURLParams({ page })
-    window.scrollTo({ top: 0, behavior: 'smooth' })
-  }
-
-  const handleFilterChange = (newFilters: FilterState) => {
-    setFilters(newFilters)
-    updateURLParams({ ...newFilters, page: 1 })
-  }
-
-  const updateURLParams = (updates: Partial<FilterState> & { page?: number }) => {
-    const params = new URLSearchParams()
-    const page = updates.page || currentPage
-    if (page > 1) params.set('page', page.toString())
-    const filterUpdates = updates as Partial<FilterState>
-    if (filterUpdates.search) params.set('q', filterUpdates.search)
-    if (filterUpdates.category) params.set('category', filterUpdates.category)
-    if (filterUpdates.tech) params.set('tech', filterUpdates.tech)
-    if (filterUpdates.year) params.set('year', filterUpdates.year)
-    if (filterUpdates.topic) params.set('topic', filterUpdates.topic)
-    if (filterUpdates.difficulties && filterUpdates.difficulties.length > 0) {
-      params.set('difficulties', filterUpdates.difficulties.join(','))
+    const page = Number(searchParams.get('page')) || 1
+    if (page !== currentPage) {
+      setCurrentPage(page)
+      fetchOrganizations(page, filters)
     }
-    router.push(`/organizations?${params.toString()}`)
-  }
+  }, [searchParams, currentPage, filters, fetchOrganizations])
 
-  const removeFilter = (key: keyof FilterState) => {
-    const newFilters = { ...filters, [key]: key === 'search' ? '' : null }
+  // Only fetch when filters change (not on initial mount, as we have initialData)
+  useEffect(() => {
+    if (isInitialMount.current) {
+      return
+    }
+    // Reset to page 1 when filters change
+    const page = 1
+    setCurrentPage(page)
+    fetchOrganizations(page, filters)
+  }, [
+    filters.search,
+    filters.category,
+    filters.tech,
+    filters.year,
+    filters.topic,
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    JSON.stringify(filters.difficulties),
+    fetchOrganizations,
+  ])
+
+  const handlePageChange = useCallback((page: number) => {
+    if (page === currentPage || isLoading || page < 1) return
+    
+    const params = new URLSearchParams()
+    if (page > 1) params.set('page', page.toString())
+    if (filters.search) params.set('q', filters.search)
+    if (filters.category) params.set('category', filters.category)
+    if (filters.tech) params.set('tech', filters.tech)
+    if (filters.year) params.set('year', filters.year)
+    if (filters.topic) params.set('topic', filters.topic)
+    if (filters.difficulties.length > 0) params.set('difficulties', filters.difficulties.join(','))
+    
+    const url = `/organizations?${params.toString()}`
+    // Prevent duplicate navigation to same URL
+    const currentUrl = window.location.pathname + window.location.search
+    if (currentUrl === url) return
+    
+    // Use startTransition to keep UI responsive during navigation
+    startTransition(() => {
+      router.push(url, { scroll: false })
+    })
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }, [currentPage, filters, isLoading, router])
+
+  const removeFilter = useCallback((key: keyof FilterState) => {
+    const newFilters = { ...filters, [key]: key === 'search' ? '' : (key === 'difficulties' ? [] : null) }
     handleFilterChange(newFilters)
-  }
+  }, [filters, handleFilterChange])
 
   // Active filters for the "Clear all" button logic
   const hasActiveFilters = filters.year !== null || 
@@ -123,21 +249,23 @@ export function OrganizationsClient({ initialData, initialPage }: OrganizationsC
   ].filter(Boolean) as Array<{ key: 'year' | 'tech' | 'topic'; label: string; value: string }>
 
   // Helper to toggle a difficulty in the array
-  const toggleDifficulty = (difficulty: string) => {
+  const toggleDifficulty = useCallback((difficulty: string) => {
     const newDifficulties = filters.difficulties.includes(difficulty)
       ? filters.difficulties.filter(d => d !== difficulty)
       : [...filters.difficulties, difficulty]
     handleFilterChange({ ...filters, difficulties: newDifficulties })
-  }
+  }, [filters, handleFilterChange])
 
   // Check if a difficulty is selected
-  const isDifficultySelected = (difficulty: string) => filters.difficulties.includes(difficulty)
+  const isDifficultySelected = useCallback((difficulty: string) => {
+    return filters.difficulties.includes(difficulty)
+  }, [filters.difficulties])
 
   return (
     <div className="flex">
       {/* Sidebar - Fixed left, 280px width */}
       <aside className="hidden lg:block w-[280px] shrink-0 bg-white fixed top-20 lg:top-24 left-4 h-[calc(100vh-5rem)] lg:h-[calc(100vh-6rem)] overflow-y-auto custom-scrollbar">
-        <FiltersSidebar onFilterChange={handleFilterChange} initialFilters={filters} />
+        <FiltersSidebar onFilterChange={handleFilterChange} filters={filters} />
       </aside>
 
       {/* Main Content - with left margin for sidebar */}
@@ -171,8 +299,8 @@ export function OrganizationsClient({ initialData, initialPage }: OrganizationsC
               type="search"
               placeholder="Search organizations by name, technology, or keyword..."
               className="pl-10 h-11 text-sm rounded-xl border border-gray-200 bg-white"
-              value={filters.search}
-              onChange={(e) => handleFilterChange({ ...filters, search: e.target.value })}
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
             />
           </div>
 
@@ -256,16 +384,19 @@ export function OrganizationsClient({ initialData, initialPage }: OrganizationsC
           {/* Sidebar Filters as Chips (for year, tech, topic) */}
           {sidebarFilters.length > 0 && (
             <div className="flex flex-wrap items-center justify-center gap-2 mb-5">
-              {sidebarFilters.map((filter) => (
-                <span
-                  key={filter.key}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[13px] bg-gray-100 text-gray-700 rounded-full cursor-pointer hover:bg-gray-200 transition-colors"
-                  onClick={() => removeFilter(filter.key)}
-                >
-                  {filter.label}
-                  <X className="h-3.5 w-3.5" />
-                </span>
-              ))}
+              {sidebarFilters.map((filter) => {
+                const handleRemove = () => removeFilter(filter.key)
+                return (
+                  <span
+                    key={filter.key}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[13px] bg-gray-100 text-gray-700 rounded-full cursor-pointer hover:bg-gray-200 transition-colors"
+                    onClick={handleRemove}
+                  >
+                    {filter.label}
+                    <X className="h-3.5 w-3.5" />
+                  </span>
+                )
+              })}
             </div>
           )}
 
@@ -283,6 +414,7 @@ export function OrganizationsClient({ initialData, initialPage }: OrganizationsC
                 {data.items.map((org) => (
                   <OrganizationCard key={org.id} org={org} />
                 ))}
+                {/* Note: Prefetch is fine here - only 20 items per page */}
               </div>
             )}
           </div>
@@ -304,7 +436,7 @@ export function OrganizationsClient({ initialData, initialPage }: OrganizationsC
                   const pageNum = i + 1
                   return (
                     <Button
-                      key={i}
+                      key={pageNum}
                       variant={pageNum === currentPage ? 'default' : 'outline'}
                       size="sm"
                       onClick={() => handlePageChange(pageNum)}
