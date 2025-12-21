@@ -127,7 +127,7 @@ export function FiltersSidebar({ onFilterChange, initialFilters }: FiltersSideba
   const visibleTechs = showAllTechs ? filteredTechs : filteredTechs.slice(0, 10)
 
   return (
-    <div className="p-4 bg-white h-full">
+    <div className="rounded-xl border border-gray-200 bg-white p-4 pb-6 shadow-md">
       {/* Header */}
       <div className="flex items-center justify-between mb-3">
         <h3 className="text-base font-semibold text-gray-900">Filters</h3>
@@ -174,7 +174,7 @@ export function FiltersSidebar({ onFilterChange, initialFilters }: FiltersSideba
       <div className="mb-4 border-t border-gray-100 pt-3">
         <button
           onClick={() => toggleSection('years')}
-          className="flex items-center justify-between w-full py-2 text-sm font-medium text-gray-900"
+          className="flex items-center justify-between w-full py-2 text-sm font-semibold text-gray-900"
         >
           <span>Years</span>
           {expandedSections.years ? (
@@ -226,7 +226,7 @@ export function FiltersSidebar({ onFilterChange, initialFilters }: FiltersSideba
       <div className="border-t border-gray-100 pt-3">
         <button
           onClick={() => toggleSection('technologies')}
-          className="flex items-center justify-between w-full py-2 text-sm font-medium text-gray-900"
+          className="flex items-center justify-between w-full py-2 text-sm font-semibold text-gray-900"
         >
           <span>Technologies</span>
           {expandedSections.technologies ? (
@@ -291,7 +291,7 @@ export function FiltersSidebar({ onFilterChange, initialFilters }: FiltersSideba
       <div className="mb-4 border-t border-gray-100 pt-3">
         <button
           onClick={() => toggleSection('categories')}
-          className="flex items-center justify-between w-full py-2 text-sm font-medium text-gray-900"
+          className="flex items-center justify-between w-full py-2 text-sm font-semibold text-gray-900"
         >
           <span>Categories</span>
           {expandedSections.categories ? (
@@ -325,7 +325,7 @@ export function FiltersSidebar({ onFilterChange, initialFilters }: FiltersSideba
       <div className="mb-4 border-t border-gray-100 pt-3">
         <button
           onClick={() => toggleSection('topics')}
-          className="flex items-center justify-between w-full py-2 text-sm font-medium text-gray-900"
+          className="flex items-center justify-between w-full py-2 text-sm font-semibold text-gray-900"
         >
           <span>Topics</span>
           {expandedSections.topics ? (
