@@ -177,7 +177,7 @@ export function FiltersSidebar({ onFilterChange, filters }: FiltersSidebarProps)
             <label className="flex items-center gap-2 cursor-pointer">
               <input
                 type="checkbox"
-                className="w-4 h-4 rounded border-gray-300 text-gray-900 focus:ring-gray-500"
+                className="w-4 h-4 rounded border-gray-300 text-teal-600 focus:ring-teal-500"
                 checked={filters.firstTimeOnly}
                 onChange={toggleFirstTime}
               />
@@ -207,7 +207,7 @@ export function FiltersSidebar({ onFilterChange, filters }: FiltersSidebarProps)
                 <label key={year} className="flex items-center gap-2 py-1 cursor-pointer">
                   <input
                     type="checkbox"
-                    className="w-4 h-4 rounded border-gray-300 text-gray-900 focus:ring-gray-500"
+                    className="w-4 h-4 rounded border-gray-300 text-teal-600 focus:ring-teal-500"
                     checked={filters.years.includes(year.toString())}
                     onChange={() => toggleYear(year.toString())}
                   />
@@ -268,9 +268,9 @@ export function FiltersSidebar({ onFilterChange, filters }: FiltersSidebarProps)
                   <div className="flex items-center gap-2">
                     <input
                       type="checkbox"
-                      className="w-4 h-4 rounded border-gray-300 text-gray-900 focus:ring-gray-500"
-                    checked={filters.techs.includes(tech.name)}
-                    onChange={() => toggleTech(tech.name)}
+                      className="w-4 h-4 rounded border-gray-300 text-teal-600 focus:ring-teal-500"
+                      checked={filters.techs.includes(tech.name)}
+                      onChange={() => toggleTech(tech.name)}
                     />
                     <span className="text-[13px] text-gray-700">{tech.name}</span>
                   </div>
@@ -320,7 +320,7 @@ export function FiltersSidebar({ onFilterChange, filters }: FiltersSidebarProps)
                 <label key={category} className="flex items-center gap-2 py-1.5 cursor-pointer">
                   <input
                     type="checkbox"
-                    className="w-4 h-4 rounded border-gray-300 text-gray-900 focus:ring-gray-500"
+                    className="w-4 h-4 rounded border-gray-300 text-teal-600 focus:ring-teal-500"
                     checked={filters.categories.includes(category)}
                     onChange={() => toggleCategory(category)}
                   />
@@ -352,7 +352,7 @@ export function FiltersSidebar({ onFilterChange, filters }: FiltersSidebarProps)
                 <label key={topic} className="flex items-center gap-2 py-1.5 cursor-pointer">
                   <input
                     type="checkbox"
-                    className="w-4 h-4 rounded border-gray-300 text-gray-900 focus:ring-gray-500"
+                    className="w-4 h-4 rounded border-gray-300 text-teal-600 focus:ring-teal-500"
                     checked={filters.topics.includes(topic)}
                     onChange={() => toggleTopic(topic)}
                   />
