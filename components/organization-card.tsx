@@ -18,7 +18,8 @@ export function OrganizationCard({
   showTechStack = true,
   className = ""
 }: OrganizationCardProps) {
-  const logoUrl = org.img_r2_url || org.logo_r2_url;
+  // Prefer R2 URLs (Cloudflare) over regular image_url
+  const logoUrl = org.img_r2_url || org.logo_r2_url || org.image_url;
 
   return (
     <Link 
