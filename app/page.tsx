@@ -31,6 +31,7 @@ export const metadata: Metadata = {
     url: SITE_URL,
     type: "website",
     siteName: "GSoC Organizations Guide",
+    // TODO: Replace with proper OG image (1200x630px) at /og.webp for better social sharing
     images: [
       {
         url: `${SITE_URL}/favicon.ico`,
@@ -41,7 +42,9 @@ export const metadata: Metadata = {
     ],
   },
   twitter: {
-    card: "summary_large_image",
+    // Using "summary" instead of "summary_large_image" since favicon is square
+    // TODO: Switch to "summary_large_image" when proper OG image (1200x630px) is available
+    card: "summary",
     title: "GSoC Organizations Explorer | Find Your Perfect Project",
     description:
       "Discover 200+ Google Summer of Code organizations. Filter by tech stack, difficulty, and find beginner-friendly projects for GSoC 2026.",

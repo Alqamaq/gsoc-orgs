@@ -73,23 +73,22 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    // Categories filter: AND or OR logic based on categoriesLogic parameter
+    // Categories filter: Only OR logic is supported since category is a single-value field
+    // AND logic is not semantically valid for a single category field
     if (categories.length > 0) {
-      if (categoriesLogic === 'AND') {
-        // AND: org must be in ALL selected categories (not possible for single category field, but handle for consistency)
-        whereConditions.push({
-          OR: categories.map(category => ({
-            category: category,
-          })),
-        })
-      } else {
-        // OR: org must be in ANY of the selected categories
-        whereConditions.push({
-          OR: categories.map(category => ({
-            category: category,
-          })),
-        })
+      if (categoriesLogic === 'AND' && categories.length > 1) {
+        // Reject invalid AND usage with multiple categories
+        return NextResponse.json(
+          { error: 'AND logic is not supported for categories filter. Categories is a single-value field, so only OR logic is valid.' },
+          { status: 400 }
+        )
       }
+      // OR: org must be in ANY of the selected categories (same behavior for single category)
+      whereConditions.push({
+        OR: categories.map(category => ({
+          category: category,
+        })),
+      })
     }
 
     // Technologies filter: AND or OR logic based on techsLogic parameter

@@ -48,6 +48,7 @@ export async function generateMetadata({
       url: getFullUrl(`/${slug}`),
       type: "website",
       siteName: "GSoC Organizations Guide",
+      // TODO: Replace with proper OG image (1200x630px) at /og.webp for better social sharing
       images: [
         {
           url: getFullUrl("/favicon.ico"),
@@ -58,7 +59,9 @@ export async function generateMetadata({
       ],
     },
     twitter: {
-      card: "summary_large_image",
+      // Using "summary" instead of "summary_large_image" since favicon is square
+      // TODO: Switch to "summary_large_image" when proper OG image (1200x630px) is available
+      card: "summary",
       title: `GSoC ${year} Organizations`,
       description: `Explore all organizations that participated in Google Summer of Code ${year}.`,
       images: [getFullUrl("/favicon.ico")],
