@@ -29,7 +29,7 @@ export const metadata: Metadata = {
     apple: [{ url: "/logo.webp", sizes: "180x180", type: "image/webp" }],
   },
   manifest: "/site.webmanifest",
-  themeColor: "#000000",
+  // themeColor: "#000000", // Commented out - should be moved to viewport export per Next.js recommendation
 };
 
 export default function RootLayout({

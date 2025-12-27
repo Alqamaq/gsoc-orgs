@@ -400,52 +400,44 @@ export function OrganizationsClient({ initialData, initialPage }: OrganizationsC
             >
               All
             </button>
+            {/* Difficulty filters - Coming soon */}
             <button
-              className={`px-3 py-1.5 text-[13px] font-medium rounded-full border transition-colors ${
-                isDifficultySelected('Beginner Friendly')
-                  ? 'bg-amber-50 text-amber-700 border-amber-200'
-                  : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'
-              }`}
-              onClick={() => toggleDifficulty('Beginner Friendly')}
+              disabled
+              className="px-3 py-1.5 text-[13px] font-medium rounded-full border bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed opacity-60 relative group"
+              title="Coming soon"
             >
               <span className="inline-flex items-center gap-1">
                 <span className="text-amber-500">🌱</span>
                 Beginner Friendly
-                {isDifficultySelected('Beginner Friendly') && (
-                  <X className="h-3.5 w-3.5 ml-0.5" />
-                )}
+              </span>
+              <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 text-xs bg-gray-900 text-white rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap">
+                Coming soon
               </span>
             </button>
             <button
-              className={`px-3 py-1.5 text-[13px] font-medium rounded-full border transition-colors ${
-                isDifficultySelected('Intermediate')
-                  ? 'bg-blue-50 text-blue-700 border-blue-200'
-                  : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'
-              }`}
-              onClick={() => toggleDifficulty('Intermediate')}
+              disabled
+              className="px-3 py-1.5 text-[13px] font-medium rounded-full border bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed opacity-60 relative group"
+              title="Coming soon"
             >
               <span className="inline-flex items-center gap-1">
                 <span className="text-blue-500">⚡</span>
                 Intermediate
-                {isDifficultySelected('Intermediate') && (
-                  <X className="h-3.5 w-3.5 ml-0.5" />
-                )}
+              </span>
+              <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 text-xs bg-gray-900 text-white rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap">
+                Coming soon
               </span>
             </button>
             <button
-              className={`px-3 py-1.5 text-[13px] font-medium rounded-full border transition-colors ${
-                isDifficultySelected('Hard')
-                  ? 'bg-red-50 text-red-700 border-red-200'
-                  : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'
-              }`}
-              onClick={() => toggleDifficulty('Hard')}
+              disabled
+              className="px-3 py-1.5 text-[13px] font-medium rounded-full border bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed opacity-60 relative group"
+              title="Coming soon"
             >
               <span className="inline-flex items-center gap-1">
                 <span className="text-red-500">🔥</span>
                 Hard
-                {isDifficultySelected('Hard') && (
-                  <X className="h-3.5 w-3.5 ml-0.5" />
-                )}
+              </span>
+              <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 text-xs bg-gray-900 text-white rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap">
+                Coming soon
               </span>
             </button>
             {hasActiveFilters && (
