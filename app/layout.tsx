@@ -17,19 +17,39 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "GSoC Organizations Guide | Google Summer of Code 2026",
+    default: "Crack GSoC 2026 – Find the Best Organizations to Get Selected",
     template: "%s | GSoC Organizations Guide",
   },
-  description: "Your comprehensive platform to discover, explore, and prepare for Google Summer of Code opportunities GSoC.",
+  description: "AI-powered GSoC organization insights and visual analytics to identify high-impact orgs and improve your GSoC 2026 selection chances.",
   icons: {
-    icon: [
-      { url: "/favicon.ico", sizes: "48x48", type: "image/x-icon" },
-      { url: "/logo.webp", sizes: "192x192", type: "image/webp" },
-    ],
-    apple: [{ url: "/logo.webp", sizes: "180x180", type: "image/webp" }],
+    icon: "/favicon.ico",
+    shortcut: "/favicon.ico",
+    apple: "/favicon.ico",
   },
   manifest: "/site.webmanifest",
-  themeColor: "#000000",
+  openGraph: {
+    type: "website",
+    siteName: "GSoC Organizations Guide",
+    locale: "en_US",
+    url: SITE_URL,
+    title: "Crack GSoC 2026 – Find the Best Organizations to Get Selected",
+    description: "AI-powered GSoC organization insights and visual analytics to identify high-impact orgs and improve your GSoC 2026 selection chances.",
+    images: [
+      {
+        url: `${SITE_URL}/og/gsoc-organizations-guide.jpg`,
+        width: 1200,
+        height: 630,
+        alt: "GSoC Organizations Guide",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Crack GSoC 2026 – Find the Best Organizations to Get Selected",
+    description: "AI-powered GSoC organization insights and visual analytics to identify high-impact orgs and improve your GSoC 2026 selection chances.",
+    images: [`${SITE_URL}/og/gsoc-organizations-guide.jpg`],
+  },
+  // themeColor: "#000000", // Commented out - should be moved to viewport export per Next.js recommendation
 };
 
 export default function RootLayout({

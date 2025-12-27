@@ -110,8 +110,8 @@ export interface Organization {
   description: string;
   category: string;
   image_url: string;
-  img_r2_url: string;
-  logo_r2_url: string | null;
+  img_r2_url?: string;
+  logo_r2_url?: string | null;
   technologies: string[];
   topics: string[];
   total_projects: number;

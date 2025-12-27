@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { ChevronDown, ChevronUp, Code } from "lucide-react";
 import { Button, Badge, Grid, Text } from "@/components/ui";
 
@@ -89,11 +90,14 @@ export function ExpandableBeginnerOrgs({
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded border flex items-center justify-center shrink-0 overflow-hidden">
                   {org.logo ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
+                    <Image
                       src={org.logo}
                       alt={org.name}
+                      width={32}
+                      height={32}
                       className="w-full h-full object-cover"
+                      unoptimized={true}
+                      loading="lazy"
                     />
                   ) : (
                     <span className="text-xs font-semibold text-muted-foreground">

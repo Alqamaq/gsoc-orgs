@@ -339,6 +339,8 @@ export function TopicPageClient({ topic, organizations }: TopicPageClientProps) 
                         width={64}
                         height={64}
                         className="w-full h-full object-cover rounded-lg"
+                        unoptimized={true}
+                        loading="lazy"
                       />
                     ) : (
                       <span className="text-2xl font-bold text-muted-foreground">

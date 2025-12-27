@@ -32,6 +32,8 @@ export async function GET(
         category: true,
         description: true,
         image_url: true,
+        img_r2_url: true,
+        logo_r2_url: true,
         url: true,
         technologies: true,
         active_years: true,

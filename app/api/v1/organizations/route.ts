@@ -75,6 +75,8 @@ export async function GET(request: NextRequest) {
           category: true,
           description: true,
           image_url: true,
+          img_r2_url: true,
+          logo_r2_url: true,
           url: true,
           active_years: true,
           first_year: true,

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { Organization } from "@/lib/api";
 
 interface OrganizationCardProps {
@@ -18,23 +19,27 @@ export function OrganizationCard({
   showTechStack = true,
   className = ""
 }: OrganizationCardProps) {
-  const logoUrl = org.img_r2_url || org.logo_r2_url;
+  // Prefer R2 URLs (Cloudflare) over regular image_url
+  const logoUrl = org.img_r2_url || org.logo_r2_url || org.image_url;
 
   return (
     <Link 
       href={`/organizations/${org.slug}`}
       prefetch={true}
-      className={`block bg-white border border-gray-200 rounded-xl p-5 hover:shadow-md hover:border-gray-300 transition-all ${className}`}
+      className={`block bg-white border border-gray-200 rounded-xl p-5 hover:shadow-md hover:border-gray-300 transition-all w-full ${className}`}
     >
       {/* Header with Logo */}
       <div className="flex items-start gap-4 mb-3">
         <div className="w-12 h-12 rounded-lg bg-gray-100 flex items-center justify-center overflow-hidden shrink-0">
           {logoUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
+            <Image
               src={logoUrl}
               alt={`${org.name} logo`}
+              width={48}
+              height={48}
               className="w-full h-full object-contain"
+              unoptimized={true}
+              loading="lazy"
             />
           ) : (
             <span className="text-lg font-semibold text-gray-400">
@@ -66,9 +71,8 @@ export function OrganizationCard({
               .map((year) => (
                 <span
                   key={year}
-                  className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium bg-teal-50 text-teal-700 rounded-md"
+                  className="inline-flex items-center px-2 py-1 text-xs font-medium bg-teal-50 text-teal-700"
                 >
-                  <span className="w-1.5 h-1.5 rounded-full bg-teal-400" />
                   {year}
                 </span>
               ))}
