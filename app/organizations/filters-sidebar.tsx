@@ -1,7 +1,8 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { Search, ChevronDown, ChevronUp, HelpCircle } from 'lucide-react'
+import { useState, useEffect, useRef } from 'react'
+import { createPortal } from 'react-dom'
+import { Search, ChevronDown, ChevronUp, HelpCircle, X } from 'lucide-react'
 
 export interface FilterState {
   search: string
@@ -63,6 +64,34 @@ export function FiltersSidebar({ onFilterChange, filters }: FiltersSidebarProps)
   const [showAllTechs, setShowAllTechs] = useState(false)
   const [showAllYears, setShowAllYears] = useState(false)
   const [showHelp, setShowHelp] = useState<{ [key: string]: boolean }>({})
+  const helpButtonRefs = useRef<{ [key: string]: HTMLButtonElement | null }>({})
+  const [tooltipPosition, setTooltipPosition] = useState<{ [key: string]: { top: number; right: number } }>({})
+  
+  // Check if component is mounted (client-side only)
+  const mounted = typeof window !== 'undefined'
+
+  // Close tooltip when clicking outside
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement
+      // Check if click is outside all help buttons and tooltips
+      if (
+        !target.closest('[data-help-button]') &&
+        !target.closest('[data-tooltip]')
+      ) {
+        setShowHelp({})
+      }
+    }
+
+    if (Object.values(showHelp).some(Boolean)) {
+      document.addEventListener('mousedown', handleClickOutside)
+      return () => {
+        document.removeEventListener('mousedown', handleClickOutside)
+      }
+    }
+  }, [showHelp])
 
   useEffect(() => {
     fetch('/api/tech-stack?limit=100')
@@ -227,18 +256,48 @@ export function FiltersSidebar({ onFilterChange, filters }: FiltersSidebarProps)
           <div className="flex items-center gap-1.5">
             <div className="relative">
               <button
-                onClick={() => setShowHelp({ ...showHelp, years: !showHelp.years })}
+                ref={(el) => { helpButtonRefs.current.years = el }}
+                data-help-button
+                onClick={(e) => {
+                  e.stopPropagation()
+                  if (helpButtonRefs.current.years) {
+                    const rect = helpButtonRefs.current.years.getBoundingClientRect()
+                    setTooltipPosition({
+                      ...tooltipPosition,
+                      years: { top: rect.top, right: rect.right }
+                    })
+                  }
+                  setShowHelp({ ...showHelp, years: !showHelp.years })
+                }}
                 className="p-1 hover:bg-gray-100 rounded"
                 title="What does AND/OR mean?"
               >
                 <HelpCircle className="h-3.5 w-3.5 text-gray-400" />
               </button>
-              {showHelp.years && (
-                <div className="absolute right-0 bottom-full mb-2 z-50 w-56 p-2.5 bg-gray-900 text-white text-xs rounded shadow-lg">
-                  <p className="mb-1.5"><strong>AND:</strong> Organization must have participated in ALL selected years</p>
-                  <p><strong>OR:</strong> Organization must have participated in ANY selected year</p>
-                  <div className="absolute -bottom-1 right-2 w-2 h-2 bg-gray-900 rotate-45"></div>
-                </div>
+              {mounted && showHelp.years && tooltipPosition.years && createPortal(
+                <div 
+                  data-tooltip
+                  className="fixed z-[9999] w-56 p-2.5 bg-gray-900 text-white text-xs rounded shadow-lg"
+                  style={{ 
+                    top: `${tooltipPosition.years.top}px`,
+                    left: `${tooltipPosition.years.right + 8}px`
+                  }}
+                >
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      setShowHelp({ ...showHelp, years: false })
+                    }}
+                    className="absolute top-1 right-1 p-0.5 hover:bg-gray-700 rounded"
+                    aria-label="Close"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                  <p className="mb-1.5 pr-5"><strong>AND:</strong> Organization must have participated in ALL selected years</p>
+                  <p className="pr-5"><strong>OR:</strong> Organization must have participated in ANY selected year</p>
+                  <div className="absolute -left-1 top-3 w-2 h-2 bg-gray-900 rotate-45"></div>
+                </div>,
+                document.body
               )}
             </div>
             <div className="flex items-center gap-1 border border-gray-200 rounded">
@@ -319,18 +378,48 @@ export function FiltersSidebar({ onFilterChange, filters }: FiltersSidebarProps)
           <div className="flex items-center gap-1.5">
             <div className="relative">
               <button
-                onClick={() => setShowHelp({ ...showHelp, technologies: !showHelp.technologies })}
+                ref={(el) => { helpButtonRefs.current.technologies = el }}
+                data-help-button
+                onClick={(e) => {
+                  e.stopPropagation()
+                  if (helpButtonRefs.current.technologies) {
+                    const rect = helpButtonRefs.current.technologies.getBoundingClientRect()
+                    setTooltipPosition({
+                      ...tooltipPosition,
+                      technologies: { top: rect.top, right: rect.right }
+                    })
+                  }
+                  setShowHelp({ ...showHelp, technologies: !showHelp.technologies })
+                }}
                 className="p-1 hover:bg-gray-100 rounded"
                 title="What does AND/OR mean?"
               >
                 <HelpCircle className="h-3.5 w-3.5 text-gray-400" />
               </button>
-              {showHelp.technologies && (
-                <div className="absolute right-0 bottom-full mb-2 z-50 w-56 p-2.5 bg-gray-900 text-white text-xs rounded shadow-lg">
-                  <p className="mb-1.5"><strong>AND:</strong> Organization must use ALL selected technologies</p>
-                  <p><strong>OR:</strong> Organization must use ANY selected technology</p>
-                  <div className="absolute -bottom-1 right-2 w-2 h-2 bg-gray-900 rotate-45"></div>
-                </div>
+              {mounted && showHelp.technologies && tooltipPosition.technologies && createPortal(
+                <div 
+                  data-tooltip
+                  className="fixed z-[9999] w-56 p-2.5 bg-gray-900 text-white text-xs rounded shadow-lg"
+                  style={{ 
+                    top: `${tooltipPosition.technologies.top}px`,
+                    left: `${tooltipPosition.technologies.right + 8}px`
+                  }}
+                >
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      setShowHelp({ ...showHelp, technologies: false })
+                    }}
+                    className="absolute top-1 right-1 p-0.5 hover:bg-gray-700 rounded"
+                    aria-label="Close"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                  <p className="mb-1.5 pr-5"><strong>AND:</strong> Organization must use ALL selected technologies</p>
+                  <p className="pr-5"><strong>OR:</strong> Organization must use ANY selected technology</p>
+                  <div className="absolute -left-1 top-3 w-2 h-2 bg-gray-900 rotate-45"></div>
+                </div>,
+                document.body
               )}
             </div>
             <div className="flex items-center gap-1 border border-gray-200 rounded">
@@ -424,18 +513,48 @@ export function FiltersSidebar({ onFilterChange, filters }: FiltersSidebarProps)
           <div className="flex items-center gap-1.5">
             <div className="relative">
               <button
-                onClick={() => setShowHelp({ ...showHelp, categories: !showHelp.categories })}
+                ref={(el) => { helpButtonRefs.current.categories = el }}
+                data-help-button
+                onClick={(e) => {
+                  e.stopPropagation()
+                  if (helpButtonRefs.current.categories) {
+                    const rect = helpButtonRefs.current.categories.getBoundingClientRect()
+                    setTooltipPosition({
+                      ...tooltipPosition,
+                      categories: { top: rect.top, right: rect.right }
+                    })
+                  }
+                  setShowHelp({ ...showHelp, categories: !showHelp.categories })
+                }}
                 className="p-1 hover:bg-gray-100 rounded"
                 title="What does AND/OR mean?"
               >
                 <HelpCircle className="h-3.5 w-3.5 text-gray-400" />
               </button>
-              {showHelp.categories && (
-                <div className="absolute right-0 bottom-full mb-2 z-50 w-56 p-2.5 bg-gray-900 text-white text-xs rounded shadow-lg">
-                  <p className="mb-1.5"><strong>AND:</strong> Organization must be in ALL selected categories</p>
-                  <p><strong>OR:</strong> Organization must be in ANY selected category</p>
-                  <div className="absolute -bottom-1 right-2 w-2 h-2 bg-gray-900 rotate-45"></div>
-                </div>
+              {mounted && showHelp.categories && tooltipPosition.categories && createPortal(
+                <div 
+                  data-tooltip
+                  className="fixed z-[9999] w-56 p-2.5 bg-gray-900 text-white text-xs rounded shadow-lg"
+                  style={{ 
+                    top: `${tooltipPosition.categories.top}px`,
+                    left: `${tooltipPosition.categories.right + 8}px`
+                  }}
+                >
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      setShowHelp({ ...showHelp, categories: false })
+                    }}
+                    className="absolute top-1 right-1 p-0.5 hover:bg-gray-700 rounded"
+                    aria-label="Close"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                  <p className="mb-1.5 pr-5"><strong>AND:</strong> Organization must be in ALL selected categories</p>
+                  <p className="pr-5"><strong>OR:</strong> Organization must be in ANY selected category</p>
+                  <div className="absolute -left-1 top-3 w-2 h-2 bg-gray-900 rotate-45"></div>
+                </div>,
+                document.body
               )}
             </div>
             <div className="flex items-center gap-1 border border-gray-200 rounded">
@@ -498,18 +617,48 @@ export function FiltersSidebar({ onFilterChange, filters }: FiltersSidebarProps)
           <div className="flex items-center gap-1.5">
             <div className="relative">
               <button
-                onClick={() => setShowHelp({ ...showHelp, topics: !showHelp.topics })}
+                ref={(el) => { helpButtonRefs.current.topics = el }}
+                data-help-button
+                onClick={(e) => {
+                  e.stopPropagation()
+                  if (helpButtonRefs.current.topics) {
+                    const rect = helpButtonRefs.current.topics.getBoundingClientRect()
+                    setTooltipPosition({
+                      ...tooltipPosition,
+                      topics: { top: rect.top, right: rect.right }
+                    })
+                  }
+                  setShowHelp({ ...showHelp, topics: !showHelp.topics })
+                }}
                 className="p-1 hover:bg-gray-100 rounded"
                 title="What does AND/OR mean?"
               >
                 <HelpCircle className="h-3.5 w-3.5 text-gray-400" />
               </button>
-              {showHelp.topics && (
-                <div className="absolute right-0 bottom-full mb-2 z-50 w-56 p-2.5 bg-gray-900 text-white text-xs rounded shadow-lg">
-                  <p className="mb-1.5"><strong>AND:</strong> Organization must have ALL selected topics</p>
-                  <p><strong>OR:</strong> Organization must have ANY selected topic</p>
-                  <div className="absolute -bottom-1 right-2 w-2 h-2 bg-gray-900 rotate-45"></div>
-                </div>
+              {mounted && showHelp.topics && tooltipPosition.topics && createPortal(
+                <div 
+                  data-tooltip
+                  className="fixed z-[9999] w-56 p-2.5 bg-gray-900 text-white text-xs rounded shadow-lg"
+                  style={{ 
+                    top: `${tooltipPosition.topics.top}px`,
+                    left: `${tooltipPosition.topics.right + 8}px`
+                  }}
+                >
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      setShowHelp({ ...showHelp, topics: false })
+                    }}
+                    className="absolute top-1 right-1 p-0.5 hover:bg-gray-700 rounded"
+                    aria-label="Close"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                  <p className="mb-1.5 pr-5"><strong>AND:</strong> Organization must have ALL selected topics</p>
+                  <p className="pr-5"><strong>OR:</strong> Organization must have ANY selected topic</p>
+                  <div className="absolute -left-1 top-3 w-2 h-2 bg-gray-900 rotate-45"></div>
+                </div>,
+                document.body
               )}
             </div>
             <div className="flex items-center gap-1 border border-gray-200 rounded">
