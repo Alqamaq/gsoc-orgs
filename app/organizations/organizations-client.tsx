@@ -484,7 +484,7 @@ export function OrganizationsClient({ initialData, initialPage }: OrganizationsC
             {isLoading ? (
               <OrganizationsGridSkeleton />
             ) : (
-              <div className="grid grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-5">
+              <div className="grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] gap-5">
                 {data.items.map((org) => (
                   <OrganizationCard key={org.id} org={org} />
                 ))}

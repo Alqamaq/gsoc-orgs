@@ -71,9 +71,8 @@ export function OrganizationCard({
               .map((year) => (
                 <span
                   key={year}
-                  className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium bg-teal-50 text-teal-700 rounded-md"
+                  className="inline-flex items-center px-2 py-1 text-xs font-medium bg-teal-50 text-teal-700"
                 >
-                  <span className="w-1.5 h-1.5 rounded-full bg-teal-400" />
                   {year}
                 </span>
               ))}

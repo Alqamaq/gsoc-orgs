@@ -234,10 +234,10 @@ export function FiltersSidebar({ onFilterChange, filters }: FiltersSidebarProps)
                 <HelpCircle className="h-3.5 w-3.5 text-gray-400" />
               </button>
               {showHelp.years && (
-                <div className="absolute right-0 top-6 z-10 w-48 p-2 bg-gray-900 text-white text-xs rounded shadow-lg">
-                  <p className="mb-1"><strong>AND:</strong> Organization must have participated in ALL selected years</p>
+                <div className="absolute right-0 bottom-full mb-2 z-50 w-56 p-2.5 bg-gray-900 text-white text-xs rounded shadow-lg">
+                  <p className="mb-1.5"><strong>AND:</strong> Organization must have participated in ALL selected years</p>
                   <p><strong>OR:</strong> Organization must have participated in ANY selected year</p>
-                  <div className="absolute -top-1 right-2 w-2 h-2 bg-gray-900 rotate-45"></div>
+                  <div className="absolute -bottom-1 right-2 w-2 h-2 bg-gray-900 rotate-45"></div>
                 </div>
               )}
             </div>
@@ -326,10 +326,10 @@ export function FiltersSidebar({ onFilterChange, filters }: FiltersSidebarProps)
                 <HelpCircle className="h-3.5 w-3.5 text-gray-400" />
               </button>
               {showHelp.technologies && (
-                <div className="absolute right-0 top-6 z-10 w-48 p-2 bg-gray-900 text-white text-xs rounded shadow-lg">
-                  <p className="mb-1"><strong>AND:</strong> Organization must use ALL selected technologies</p>
+                <div className="absolute right-0 bottom-full mb-2 z-50 w-56 p-2.5 bg-gray-900 text-white text-xs rounded shadow-lg">
+                  <p className="mb-1.5"><strong>AND:</strong> Organization must use ALL selected technologies</p>
                   <p><strong>OR:</strong> Organization must use ANY selected technology</p>
-                  <div className="absolute -top-1 right-2 w-2 h-2 bg-gray-900 rotate-45"></div>
+                  <div className="absolute -bottom-1 right-2 w-2 h-2 bg-gray-900 rotate-45"></div>
                 </div>
               )}
             </div>
@@ -369,7 +369,7 @@ export function FiltersSidebar({ onFilterChange, filters }: FiltersSidebarProps)
                 className="w-full h-8 pl-8 pr-3 text-xs border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-200"
               />
             </div>
-            <div className="space-y-0.5 max-h-52 overflow-y-auto">
+            <div className="space-y-0.5 max-h-52 overflow-y-auto custom-scrollbar pr-1">
               {visibleTechs.map((tech) => (
                 <label key={tech.name} className="flex items-center justify-between py-1.5 cursor-pointer">
                   <div className="flex items-center gap-2">
@@ -431,10 +431,10 @@ export function FiltersSidebar({ onFilterChange, filters }: FiltersSidebarProps)
                 <HelpCircle className="h-3.5 w-3.5 text-gray-400" />
               </button>
               {showHelp.categories && (
-                <div className="absolute right-0 top-6 z-10 w-48 p-2 bg-gray-900 text-white text-xs rounded shadow-lg">
-                  <p className="mb-1"><strong>AND:</strong> Organization must be in ALL selected categories</p>
+                <div className="absolute right-0 bottom-full mb-2 z-50 w-56 p-2.5 bg-gray-900 text-white text-xs rounded shadow-lg">
+                  <p className="mb-1.5"><strong>AND:</strong> Organization must be in ALL selected categories</p>
                   <p><strong>OR:</strong> Organization must be in ANY selected category</p>
-                  <div className="absolute -top-1 right-2 w-2 h-2 bg-gray-900 rotate-45"></div>
+                  <div className="absolute -bottom-1 right-2 w-2 h-2 bg-gray-900 rotate-45"></div>
                 </div>
               )}
             </div>
@@ -505,10 +505,10 @@ export function FiltersSidebar({ onFilterChange, filters }: FiltersSidebarProps)
                 <HelpCircle className="h-3.5 w-3.5 text-gray-400" />
               </button>
               {showHelp.topics && (
-                <div className="absolute right-0 top-6 z-10 w-48 p-2 bg-gray-900 text-white text-xs rounded shadow-lg">
-                  <p className="mb-1"><strong>AND:</strong> Organization must have ALL selected topics</p>
+                <div className="absolute right-0 bottom-full mb-2 z-50 w-56 p-2.5 bg-gray-900 text-white text-xs rounded shadow-lg">
+                  <p className="mb-1.5"><strong>AND:</strong> Organization must have ALL selected topics</p>
                   <p><strong>OR:</strong> Organization must have ANY selected topic</p>
-                  <div className="absolute -top-1 right-2 w-2 h-2 bg-gray-900 rotate-45"></div>
+                  <div className="absolute -bottom-1 right-2 w-2 h-2 bg-gray-900 rotate-45"></div>
                 </div>
               )}
             </div>
