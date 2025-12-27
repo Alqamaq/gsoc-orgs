@@ -12,9 +12,16 @@
  */
 
 const API_BASE = process.env.API_BASE || 'http://localhost:3000'
+const ADMIN_KEY = process.env.ADMIN_KEY
 const TARGET_YEAR = process.argv[2] ? parseInt(process.argv[2]) : new Date().getFullYear()
 
 async function computeFirstTime() {
+  if (!ADMIN_KEY) {
+    console.error('❌ Error: ADMIN_KEY environment variable is not set.')
+    console.error('   Please set ADMIN_KEY in your .env file or environment variables.')
+    process.exit(1)
+  }
+
   try {
     console.log(`Computing first_time field for year ${TARGET_YEAR}...`)
     console.log(`Calling API: ${API_BASE}/api/admin/compute-first-time?year=${TARGET_YEAR}`)
@@ -23,6 +30,7 @@ async function computeFirstTime() {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'x-admin-key': ADMIN_KEY,
       },
     })
 

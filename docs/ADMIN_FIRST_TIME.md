@@ -10,6 +10,10 @@ The `first_time` field identifies organizations that are participating in GSoC f
 
 Computes and updates the `first_time` field for all organizations based on a target year.
 
+**Authentication:**
+- **Required Header**: `x-admin-key` - Must match the `ADMIN_KEY` environment variable
+- Set `ADMIN_KEY` in your `.env` file or environment variables
+
 **Query Parameters:**
 - `year` (optional): Target year to compute first-time organizations for. Defaults to current year if not provided.
 
@@ -35,6 +39,9 @@ Computes and updates the `first_time` field for all organizations based on a tar
 
 Returns statistics about first-time organizations for a given year.
 
+**Authentication:**
+- **Required Header**: `x-admin-key` - Must match the `ADMIN_KEY` environment variable
+
 **Response:**
 ```json
 {
@@ -54,14 +61,20 @@ Returns statistics about first-time organizations for a given year.
 ### Via API Call
 
 ```bash
+# Set your admin key (or use .env file)
+export ADMIN_KEY=your-secret-key-here
+
 # Compute for current year (default)
-curl -X POST http://localhost:3000/api/admin/compute-first-time
+curl -X POST http://localhost:3000/api/admin/compute-first-time \
+  -H "x-admin-key: $ADMIN_KEY"
 
 # Compute for specific year
-curl -X POST http://localhost:3000/api/admin/compute-first-time?year=2025
+curl -X POST http://localhost:3000/api/admin/compute-first-time?year=2025 \
+  -H "x-admin-key: $ADMIN_KEY"
 
 # Check statistics
-curl http://localhost:3000/api/admin/compute-first-time?year=2025
+curl http://localhost:3000/api/admin/compute-first-time?year=2025 \
+  -H "x-admin-key: $ADMIN_KEY"
 ```
 
 ### Via Script
@@ -88,11 +101,13 @@ When GSoC 2026 organizations are released:
 1. Import new organizations into the database
 2. Run the computation:
    ```bash
-   curl -X POST http://localhost:3000/api/admin/compute-first-time?year=2026
+   curl -X POST http://localhost:3000/api/admin/compute-first-time?year=2026 \
+     -H "x-admin-key: $ADMIN_KEY"
    ```
 3. Verify results:
    ```bash
-   curl http://localhost:3000/api/admin/compute-first-time?year=2026
+   curl http://localhost:3000/api/admin/compute-first-time?year=2026 \
+     -H "x-admin-key: $ADMIN_KEY"
    ```
 
 ## Database Schema

@@ -2,9 +2,27 @@ import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 
 /**
+ * Helper to check admin authentication
+ */
+function isAuthorized(request: NextRequest): boolean {
+  const adminKey = request.headers.get('x-admin-key')
+  const expectedKey = process.env.ADMIN_KEY
+  
+  if (!expectedKey) {
+    console.warn('ADMIN_KEY environment variable not set. Admin endpoint is unprotected!')
+    return false
+  }
+  
+  return adminKey === expectedKey
+}
+
+/**
  * POST /api/admin/compute-first-time
  * 
  * Computes and updates the first_time field for all organizations based on a target year.
+ * 
+ * Headers:
+ * - x-admin-key: Admin authentication key (must match ADMIN_KEY env variable)
  * 
  * Query Parameters:
  * - year: number (optional, defaults to current year)
@@ -18,6 +36,20 @@ import prisma from '@/lib/prisma'
  * - To refresh first_time status for all organizations
  */
 export async function POST(request: NextRequest) {
+  // Check authentication
+  if (!isAuthorized(request)) {
+    return NextResponse.json(
+      {
+        success: false,
+        error: {
+          message: 'Unauthorized. Admin key required.',
+          code: 'UNAUTHORIZED',
+        },
+      },
+      { status: 401 }
+    )
+  }
+
   try {
     const searchParams = request.nextUrl.searchParams
     const targetYearParam = searchParams.get('year')
@@ -119,8 +151,25 @@ export async function POST(request: NextRequest) {
  * GET /api/admin/compute-first-time
  * 
  * Returns information about the first_time computation status
+ * 
+ * Headers:
+ * - x-admin-key: Admin authentication key (must match ADMIN_KEY env variable)
  */
 export async function GET(request: NextRequest) {
+  // Check authentication
+  if (!isAuthorized(request)) {
+    return NextResponse.json(
+      {
+        success: false,
+        error: {
+          message: 'Unauthorized. Admin key required.',
+          code: 'UNAUTHORIZED',
+        },
+      },
+      { status: 401 }
+    )
+  }
+
   try {
     const searchParams = request.nextUrl.searchParams
     const targetYearParam = searchParams.get('year')
