@@ -6,6 +6,9 @@ const nextConfig: NextConfig = {
   // If you experience "double-click" issues in dev, test with: pnpm build && pnpm start
   reactStrictMode: true,
   images: {
+    // Disable image optimization to reduce Vercel usage
+    // Organization logos are already optimized and cached on Cloudflare R2
+    unoptimized: false, // Keep false to allow unoptimized prop per-image
     remotePatterns: [
       {
         protocol: 'https',

@@ -242,6 +242,8 @@ export function OrganizationClient({ organization: org }: OrganizationClientProp
                       width={144}
                       height={144}
                       className="w-full h-full object-contain p-2"
+                      unoptimized={true}
+                      priority={false}
                     />
                   ) : (
                     <span className="text-5xl font-bold text-sky-600">

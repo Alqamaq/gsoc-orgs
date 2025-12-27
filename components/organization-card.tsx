@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { Organization } from "@/lib/api";
 
 interface OrganizationCardProps {
@@ -31,11 +32,14 @@ export function OrganizationCard({
       <div className="flex items-start gap-4 mb-3">
         <div className="w-12 h-12 rounded-lg bg-gray-100 flex items-center justify-center overflow-hidden shrink-0">
           {logoUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
+            <Image
               src={logoUrl}
               alt={`${org.name} logo`}
+              width={48}
+              height={48}
               className="w-full h-full object-contain"
+              unoptimized={true}
+              loading="lazy"
             />
           ) : (
             <span className="text-lg font-semibold text-gray-400">

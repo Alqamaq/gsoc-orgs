@@ -434,6 +434,8 @@ function OrganizationCard({ org }: {
                 width={48}
                 height={48}
                 className="w-full h-full object-contain"
+                unoptimized={true}
+                loading="lazy"
               />
             ) : (
               <span className="text-lg font-semibold text-muted-foreground">
