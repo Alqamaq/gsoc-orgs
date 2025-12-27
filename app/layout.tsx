@@ -22,12 +22,9 @@ export const metadata: Metadata = {
   },
   description: "Your comprehensive platform to discover, explore, and prepare for Google Summer of Code opportunities GSoC.",
   icons: {
-    icon: [
-      { url: "/favicon.ico", sizes: "any" },
-      { url: "/favicon.ico", sizes: "48x48", type: "image/x-icon" },
-    ],
-    shortcut: [{ url: "/favicon.ico" }],
-    apple: [{ url: "/favicon.ico", sizes: "180x180" }],
+    icon: "/favicon.ico",
+    shortcut: "/favicon.ico",
+    apple: "/favicon.ico",
   },
   manifest: "/site.webmanifest",
   openGraph: {
