@@ -387,6 +387,7 @@ model organizations {
   created_at             String
   description            String
   first_year             Int
+  first_time             Boolean?             // Computed field: true if org is first-time in the target year
   id_                    String               @unique(map: "id_1") @map("id")
   image_background_color String
   image_slug             String
@@ -416,6 +417,7 @@ model organizations {
   @@index([category], map: "category_1")
   @@index([is_currently_active], map: "is_currently_active_1")
   @@index([total_projects(sort: Desc)], map: "total_projects_-1")
+  @@index([first_time], map: "first_time_1")
 }
 
 model organizations_old_backup {
