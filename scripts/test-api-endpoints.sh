@@ -79,13 +79,9 @@ else
 fi
 echo ""
 
-# Test 13: Admin GET endpoint
-echo "1️⃣3️⃣  Testing admin GET endpoint..."
-if [ -n "$ADMIN_KEY" ] && [ "$ADMIN_KEY" != "test-admin-key" ]; then
-  curl -s -H "x-admin-key: ${ADMIN_KEY}" "${BASE_URL}/api/admin/compute-first-time?year=2025" | jq -r '.success, .data.firstTimeOrganizations // .error.message' 2>/dev/null || echo "❌ Failed"
-else
-  echo "⚠️  Skipped - Set ADMIN_KEY env variable to test"
-fi
+# Test 13: Admin GET endpoint (public, no auth needed)
+echo "1️⃣3️⃣  Testing admin GET endpoint (public)..."
+curl -s "${BASE_URL}/api/admin/compute-first-time?year=2025" | jq -r '.success, .data.firstTimeOrganizations // .error.message' 2>/dev/null || echo "❌ Failed"
 echo ""
 
 echo "✅ Testing complete!"

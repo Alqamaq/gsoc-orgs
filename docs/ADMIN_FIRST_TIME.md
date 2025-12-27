@@ -39,8 +39,7 @@ Computes and updates the `first_time` field for all organizations based on a tar
 
 Returns statistics about first-time organizations for a given year.
 
-**Authentication:**
-- **Required Header**: `x-admin-key` - Must match the `ADMIN_KEY` environment variable
+**Note:** This endpoint is **public** (no authentication required) for open source usage.
 
 **Response:**
 ```json
@@ -72,9 +71,8 @@ curl -X POST http://localhost:3000/api/admin/compute-first-time \
 curl -X POST http://localhost:3000/api/admin/compute-first-time?year=2025 \
   -H "x-admin-key: $ADMIN_KEY"
 
-# Check statistics
-curl http://localhost:3000/api/admin/compute-first-time?year=2025 \
-  -H "x-admin-key: $ADMIN_KEY"
+# Check statistics (public endpoint, no auth needed)
+curl http://localhost:3000/api/admin/compute-first-time?year=2025
 ```
 
 ### Via Script
@@ -104,10 +102,9 @@ When GSoC 2026 organizations are released:
    curl -X POST http://localhost:3000/api/admin/compute-first-time?year=2026 \
      -H "x-admin-key: $ADMIN_KEY"
    ```
-3. Verify results:
+3. Verify results (public endpoint):
    ```bash
-   curl http://localhost:3000/api/admin/compute-first-time?year=2026 \
-     -H "x-admin-key: $ADMIN_KEY"
+   curl http://localhost:3000/api/admin/compute-first-time?year=2026
    ```
 
 ## Database Schema

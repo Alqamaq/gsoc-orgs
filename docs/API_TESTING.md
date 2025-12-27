@@ -200,14 +200,13 @@ curl -X POST \
 
 ---
 
-### 13. Admin Endpoint - With Auth (GET)
+### 13. Admin Endpoint - GET (Public)
 
 ```bash
-curl -H "x-admin-key: ${ADMIN_KEY}" \
-  "http://localhost:3000/api/admin/compute-first-time?year=2025"
+curl "http://localhost:3000/api/admin/compute-first-time?year=2025"
 ```
 
-**Expected:** Returns statistics about first-time organizations
+**Expected:** Returns statistics about first-time organizations (no auth required - public endpoint)
 
 **Response:**
 ```json

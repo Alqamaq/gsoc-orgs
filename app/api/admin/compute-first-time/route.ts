@@ -3,6 +3,7 @@ import prisma from '@/lib/prisma'
 
 /**
  * Helper to check admin authentication
+ * Uses secure comparison to prevent timing attacks
  */
 function isAuthorized(request: NextRequest): boolean {
   const adminKey = request.headers.get('x-admin-key')
@@ -13,7 +14,23 @@ function isAuthorized(request: NextRequest): boolean {
     return false
   }
   
-  return adminKey === expectedKey
+  if (!adminKey) {
+    return false
+  }
+  
+  // Use secure comparison to prevent timing attacks
+  // Compare lengths first, then use constant-time comparison
+  if (adminKey.length !== expectedKey.length) {
+    return false
+  }
+  
+  // Constant-time string comparison
+  let result = 0
+  for (let i = 0; i < expectedKey.length; i++) {
+    result |= adminKey.charCodeAt(i) ^ expectedKey.charCodeAt(i)
+  }
+  
+  return result === 0
 }
 
 /**
@@ -152,24 +169,9 @@ export async function POST(request: NextRequest) {
  * 
  * Returns information about the first_time computation status
  * 
- * Headers:
- * - x-admin-key: Admin authentication key (must match ADMIN_KEY env variable)
+ * Note: This endpoint is public (no authentication required) for open source usage
  */
 export async function GET(request: NextRequest) {
-  // Check authentication
-  if (!isAuthorized(request)) {
-    return NextResponse.json(
-      {
-        success: false,
-        error: {
-          message: 'Unauthorized. Admin key required.',
-          code: 'UNAUTHORIZED',
-        },
-      },
-      { status: 401 }
-    )
-  }
-
   try {
     const searchParams = request.nextUrl.searchParams
     const targetYearParam = searchParams.get('year')
