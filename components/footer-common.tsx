@@ -12,12 +12,28 @@ export const FOOTER_COPYRIGHT = {
 
 export const SOCIAL_LINKS = {
   github: {
-    href: "https://github.com/ketankauntia/gsoc-orgs/",
-    label: "GSoC Organizations Guide GitHub",
+    href: "https://github.com/ketankauntia",
+    label: "GitHub",
   },
   twitter: {
-    href: "https://www.x.com/kauntiaketan",
-    label: "GSoC Organizations Guide Twitter @kauntiaketan",
+    href: "https://x.com/gsoc_orgs_guide",
+    label: "Twitter (X)",
+  },
+  linkedin: {
+    href: "https://www.linkedin.com/company/gsoc-organizations-guide/",
+    label: "LinkedIn",
+  },
+  facebook: {
+    href: "https://www.facebook.com/people/Gsoc-Organizations-Guide/61586071196146/",
+    label: "Facebook",
+  },
+  pinterest: {
+    href: "https://www.pinterest.com/gsocorganizationsguide/",
+    label: "Pinterest",
+  },
+  quora: {
+    href: "https://www.quora.com/profile/GSoC-Organizations-Guide",
+    label: "Quora",
   },
 };
 
