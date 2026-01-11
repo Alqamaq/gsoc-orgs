@@ -7,7 +7,15 @@ import type { Metadata } from "next";
 import { SITE_URL, getFullUrl } from "@/lib/constants";
 
 // Force revalidation to ensure footer links stay updated
-export const revalidate = 3600; // Revalidate every hour
+/**
+ * ISR Configuration for Homepage
+ *
+ * The homepage shows trending data and statistics.
+ * Cache for 1 day - balances freshness with performance.
+ *
+ * For immediate updates: POST /api/admin/invalidate-cache { "type": "path", "path": "/" }
+ */
+export const revalidate = 86400; // 1 day
 
 export const metadata: Metadata = {
   title: "Crack GSoC 2026 – Find the Best Organizations to Get Selected",

@@ -28,8 +28,21 @@ import {
 import { GSoCYearClient } from "./gsoc-year-client";
 import { AllOrganizationsSection } from "./all-organizations-section";
 
-// This page relies on dynamic request data (e.g. API fetches) and can't be fully pre-rendered
-export const dynamic = 'force-dynamic';
+/**
+ * ISR Configuration for Year Pages
+ *
+ * Strategy:
+ * - Historical years (2+ years ago): Data is immutable, cache for 30 days
+ * - Current/upcoming years: Data may update during GSoC season, cache for 1 day
+ *
+ * Note: We use 30 days instead of 365 days because Next.js ISR has a max
+ * practical limit, and 30 days provides a good balance between performance
+ * and allowing occasional updates.
+ *
+ * For cache invalidation when new data is added, use:
+ * POST /api/admin/invalidate-cache { "type": "year", "year": 2025 }
+ */
+export const revalidate = 86400; // 1 day base - individual queries use year-specific TTLs
 
 // Fetch organizations for a specific year
 async function fetchOrganizationsByYear(year: string): Promise<Organization[]> {
@@ -312,9 +325,8 @@ export async function generateStaticParams() {
   return slugs;
 }
 
-// Force revalidation to ensure footer links stay updated
-// This prevents serving stale cached HTML with old links
-export const revalidate = 3600; // Revalidate every hour
+// Note: revalidate is set at the top of the file (86400 seconds = 1 day)
+// For cache invalidation, use POST /api/admin/invalidate-cache
 
 // Main Page Component
 export default async function GSoCYearOrganizationsPage({
