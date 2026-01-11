@@ -1,13 +1,21 @@
 import { Header } from "@/components/header";
 import { HeroComponent } from "@/components/hero-component";
+import { BrandsGrid } from "@/components/ui";
+import {
+  OrganizationsBlock,
+  PreviousEditionsBlock,
+  TechStackBlock,
+  AnalyticsBlock,
+} from "@/components/value-blocks";
 import { TrendingOrgs } from "@/components/trending-orgs";
+import { Testimonials } from "@/components/testimonials";
 import { WaitlistCTA } from "@/components/waitlist-cta";
+import { LatestArticles } from "@/components/latest-articles";
 import { FaqComponent } from "@/components/faq";
 import { Footer } from "@/components/Footer";
 import type { Metadata } from "next";
 import { SITE_URL, getFullUrl } from "@/lib/constants";
 
-// Force revalidation to ensure footer links stay updated
 /**
  * ISR Configuration for Homepage
  *
@@ -71,7 +79,7 @@ export default function Home() {
     url: SITE_URL,
     potentialAction: {
       "@type": "SearchAction",
-      target: `${getFullUrl('/organizations')}?q={search_term_string}`,
+      target: `${getFullUrl("/organizations")}?q={search_term_string}`,
       "query-input": "required name=search_term_string",
     },
   };
@@ -84,8 +92,28 @@ export default function Home() {
       />
       <Header />
       <HeroComponent />
+      <BrandsGrid
+        title="GSoC Organizations Guide featured on"
+        brands={[
+          {
+            name: "GDG Cloud Nagpur",
+            logo: "/gdg-cloud-nagpur.webp",
+            href: "https://gdg.community.dev/events/details/google-gdg-cloud-nagpur-presents-gsoc-2026-complete-guide-live-session-on-google-summer-of-code/",
+          },
+        ]}
+      />
+      {/* Primary Value Blocks */}
+      <OrganizationsBlock />
+      <PreviousEditionsBlock />
+      <TechStackBlock />
+      <AnalyticsBlock />
+      {/* Social Proof & Discovery */}
       <TrendingOrgs />
+      <Testimonials />
+      {/* Content & Support */}
+      <LatestArticles />
       <FaqComponent />
+      {/* Primary CTA */}
       <WaitlistCTA />
       <Footer />
     </>
