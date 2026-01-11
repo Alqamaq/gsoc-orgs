@@ -90,6 +90,66 @@ export const actionColors = {
   },
 } as const;
 
+/**
+ * Chart colors - Teal gradient for bar charts
+ * Used across tech-stack charts, year charts, and other visualizations
+ */
+export const chartColors = {
+  /** Teal gradient palette for bar charts (dark to light) */
+  tealGradient: [
+    '#0d9488', // teal-600
+    '#14b8a6', // teal-500
+    '#2dd4bf', // teal-400
+    '#5eead4', // teal-300
+    '#99f6e4', // teal-200
+  ] as const,
+  /** Extended palette (repeating for 10+ items) */
+  tealGradientExtended: [
+    '#0d9488', '#14b8a6', '#2dd4bf', '#5eead4', '#99f6e4',
+    '#0d9488', '#14b8a6', '#2dd4bf', '#5eead4', '#99f6e4',
+  ] as const,
+  /** Accent colors for multi-series charts */
+  accent: {
+    primary: '#0d9488',   // teal-600
+    secondary: '#14b8a6', // teal-500
+    tertiary: '#2dd4bf',  // teal-400
+  },
+  /** Difficulty level colors for charts (hex values for recharts) */
+  difficulty: {
+    beginner: '#3b82f6',     // blue-500
+    intermediate: '#22c55e', // green-500
+    advanced: '#f97316',     // orange-500
+    advancedFriendly: '#eab308', // yellow-500
+    default: '#0d9488',      // teal-600
+  },
+  /** Grid and axis colors */
+  grid: '#e5e7eb',        // gray-200
+  axis: '#6b7280',        // gray-500
+} as const;
+
+/**
+ * Get difficulty chart color by level name
+ * @param level - Difficulty level string
+ * @returns Hex color string
+ */
+export function getDifficultyChartColor(level: string): string {
+  const levelLower = level.toLowerCase();
+  if (levelLower.includes('beginner')) return chartColors.difficulty.beginner;
+  if (levelLower.includes('intermediate')) return chartColors.difficulty.intermediate;
+  if (levelLower.includes('advanced friendly')) return chartColors.difficulty.advancedFriendly;
+  if (levelLower.includes('advanced')) return chartColors.difficulty.advanced;
+  return chartColors.difficulty.default;
+}
+
+/**
+ * Get bar color by index from the teal gradient
+ * @param index - Bar index
+ * @returns Hex color string
+ */
+export function getChartBarColor(index: number): string {
+  return chartColors.tealGradientExtended[index % chartColors.tealGradientExtended.length];
+}
+
 // =============================================================================
 // SPACING TOKENS
 // =============================================================================
