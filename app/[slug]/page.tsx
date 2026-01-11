@@ -44,56 +44,78 @@ import { AllOrganizationsSection } from "./all-organizations-section";
  */
 export const revalidate = 86400; // 1 day base - individual queries use year-specific TTLs
 
-// Fetch organizations for a specific year
+// Fetch organizations for a specific year (handles pagination)
 async function fetchOrganizationsByYear(year: string): Promise<Organization[]> {
   try {
-    const response = await apiFetchServer<{
-      success: boolean;
-      data: {
-        organizations: Array<{
-          slug: string;
-          name: string;
-          category: string;
-          description: string;
-          image_url: string;
-          technologies: string[];
-          topics: string[];
-          years: Record<string, unknown>;
-          stats: {
-            projects_by_year: Record<string, number>;
-            students_by_year: Record<string, number>;
-          };
-        }>;
-      };
-    }>(`/api/v1/years/${year}/organizations?limit=100`);
-
-    if (!response.success || !response.data) {
-      return [];
-    }
-
+    const allOrgs: Organization[] = [];
     const yearNum = parseInt(year, 10);
     const yearKey = `year_${yearNum}`;
+    let page = 1;
+    let hasMore = true;
 
-    return response.data.organizations.map((org) => {
-      const yearData = (org.years as Record<string, { num_projects?: number }>)[yearKey];
-      return {
-      id: org.slug,
-      name: org.name,
-      slug: org.slug,
-      description: org.description,
-      category: org.category,
-      image_url: org.image_url,
-      img_r2_url: org.image_url,
-      logo_r2_url: org.image_url,
-      technologies: org.technologies || [],
-      topics: org.topics || [],
-      total_projects: (yearData?.num_projects as number) || 0,
-      is_currently_active: true,
-      first_year: yearNum,
-      last_year: yearNum,
-      active_years: [yearNum],
-      };
-    });
+    // Fetch all pages to get complete org list with accurate first_year data
+    while (hasMore) {
+      const response = await apiFetchServer<{
+        success: boolean;
+        data: {
+          organizations: Array<{
+            slug: string;
+            name: string;
+            category: string;
+            description: string;
+            image_url: string;
+            img_r2_url?: string;
+            logo_r2_url?: string;
+            technologies: string[];
+            topics: string[];
+            years: Record<string, unknown>;
+            stats: {
+              projects_by_year: Record<string, number>;
+              students_by_year: Record<string, number>;
+            };
+            first_year: number;
+            active_years: number[];
+          }>;
+          pagination: {
+            page: number;
+            pages: number;
+          };
+        };
+      }>(`/api/v1/years/${year}/organizations?limit=100&page=${page}`);
+
+      if (!response.success || !response.data) {
+        break;
+      }
+
+      const orgs = response.data.organizations.map((org) => {
+        const yearData = (org.years as Record<string, { num_projects?: number }>)[yearKey];
+        return {
+          id: org.slug,
+          name: org.name,
+          slug: org.slug,
+          description: org.description,
+          category: org.category,
+          image_url: org.image_url,
+          img_r2_url: org.img_r2_url || org.image_url,
+          logo_r2_url: org.logo_r2_url || org.image_url,
+          technologies: org.technologies || [],
+          topics: org.topics || [],
+          total_projects: (yearData?.num_projects as number) || 0,
+          is_currently_active: true,
+          first_year: org.first_year, // Use actual first_year from API
+          last_year: yearNum,
+          active_years: org.active_years || [yearNum],
+        };
+      });
+
+      allOrgs.push(...orgs);
+
+      // Check if there are more pages
+      hasMore = page < response.data.pagination.pages;
+      page++;
+    }
+
+    return allOrgs;
   } catch (error) {
     console.error("Error fetching organizations:", error);
     return [];

@@ -64,6 +64,8 @@ export async function GET(
           topics: true,
           years: true,
           stats: true,
+          first_year: true,
+          active_years: true,
         },
       }),
       prisma.organizations.count({ where }),

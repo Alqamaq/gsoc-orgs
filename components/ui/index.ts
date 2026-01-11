@@ -31,6 +31,5 @@ export {
   CarouselPrevious,
 } from "./carousel";
 
-
 // Brand Components
 export { BrandsGrid } from "./brands";
