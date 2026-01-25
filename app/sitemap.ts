@@ -1,6 +1,8 @@
 import { MetadataRoute } from 'next'
 import { SITE_URL } from '@/lib/constants'
 import prisma from '@/lib/prisma'
+import { loadTopicsIndexData } from '@/lib/topics-page-types'
+import { getAvailableProjectYears } from '@/lib/projects-page-types'
 
 /**
  * Fetch all organization slugs directly from database
@@ -45,36 +47,84 @@ async function getAllTechStackSlugs(): Promise<string[]> {
 }
 
 /**
- * Get all topic slugs (hardcoded list from topics page)
+ * Get all topic slugs from static JSON data
  */
-function getAllTopicSlugs(): string[] {
-  return [
-    'web-development',
-    'machine-learning',
-    'systems-programming',
-    'data-science',
-    'security-privacy',
-    'cloud-infrastructure',
-    'mobile-development',
-    'devtools',
-    'graphics-multimedia',
-    'databases',
-    'programming-languages',
-    'documentation',
-  ]
+async function getAllTopicSlugs(): Promise<string[]> {
+  try {
+    const topicsData = await loadTopicsIndexData()
+    if (!topicsData) {
+      // Fallback to hardcoded list if JSON not available
+      return [
+        'web-development',
+        'machine-learning',
+        'systems-programming',
+        'data-science',
+        'security-privacy',
+        'cloud-infrastructure',
+        'mobile-development',
+        'devtools',
+        'graphics-multimedia',
+        'databases',
+        'programming-languages',
+        'documentation',
+      ]
+    }
+    return topicsData.topics.map(topic => topic.slug)
+  } catch (error) {
+    if (process.env.NODE_ENV === 'development') {
+      console.error('[SITEMAP] Error loading topics:', error)
+    }
+    return []
+  }
 }
 
+/**
+ * Get all project IDs for project detail pages
+ * Fetches from database to get all unique project IDs
+ */
+async function getAllProjectIds(): Promise<Array<{ project_id: string; org_slug: string }>> {
+  try {
+    const projects = await prisma.projects.findMany({
+      select: {
+        project_id: true,
+        org_slug: true,
+      },
+      distinct: ['project_id'],
+    })
+    return projects
+  } catch (error) {
+    if (process.env.NODE_ENV === 'development') {
+      console.error('[SITEMAP] Error fetching project IDs:', error)
+    }
+    return []
+  }
+}
+
+/**
+ * Sitemap Generation
+ * 
+ * Currently generated at build time (no revalidate configured).
+ * If you add `export const revalidate = X` to this file, it becomes ISR instead of build-only.
+ * 
+ * Base URL validation:
+ * - Ensures no trailing slash
+ * - Uses https protocol
+ * - Falls back to production URL if env not set
+ */
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = SITE_URL
+  // Ensure baseUrl has no trailing slash and uses https
+  const baseUrl = SITE_URL.replace(/\/$/, '').replace(/^http:/, 'https:')
 
   // Fetch dynamic routes in parallel
-  const [orgSlugs, techSlugs, topicSlugs] = await Promise.all([
+  const [orgSlugs, techSlugs, topicSlugs, projectIds] = await Promise.all([
     getAllOrganizationSlugs(),
     getAllTechStackSlugs(),
-    Promise.resolve(getAllTopicSlugs()),
+    getAllTopicSlugs(),
+    getAllProjectIds(),
   ])
 
-  // Static routes
+  // Static routes explicitly listed (excluding dynamic children like /organizations/[slug])
+  // These are top-level pages without dynamic parameters
   const staticRoutes = [
     '',
     '/about',
@@ -84,6 +134,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     '/organizations',
     '/tech-stack',
     '/topics',
+    '/projects',
+    '/yearly',
+    '/blog',
   ]
 
   // Generate year-based routes (2016 to current year - 1, excluding future years)
@@ -95,6 +148,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   for (let year = 2016; year <= lastCompletedYear; year++) {
     yearRoutes.push(`/yearly/google-summer-of-code-${year}`)
   }
+
+  // Generate project year routes (2016 to current year)
+  const projectYearRoutes = getAvailableProjectYears().map(year => `/projects/${year}`)
 
   // Combine all routes with appropriate priorities
   const routes: MetadataRoute.Sitemap = [
@@ -136,6 +192,23 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: new Date(),
       changeFrequency: 'yearly' as const,
       priority: 0.8,
+    })),
+    
+    // Project year pages - medium priority
+    ...projectYearRoutes.map((route) => ({
+      url: `${baseUrl}${route}`,
+      lastModified: new Date(),
+      changeFrequency: 'yearly' as const,
+      priority: 0.75,
+    })),
+    
+    // Project detail pages - lower priority (deep pages, many URLs)
+    // Deprioritized to preserve crawl budget for higher-value pages
+    ...projectIds.map(({ project_id, org_slug }) => ({
+      url: `${baseUrl}/organizations/${org_slug}/projects/${project_id}`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly' as const,
+      priority: 0.6,
     })),
   ]
 
