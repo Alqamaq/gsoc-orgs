@@ -12,7 +12,8 @@
     "postinstall": "prisma generate",
     "prepare": "husky",
     "generate:organizations": "node scripts/generate-organizations-data.js",
-    "generate:tech-stack": "node scripts/generate-tech-stack-data.js"
+    "generate:tech-stack": "node scripts/generate-tech-stack-data.js",
+    "generate:topics": "node scripts/generate-topics-data.js"
   },
   "dependencies": {
     "@prisma/client": "5.22.0",
