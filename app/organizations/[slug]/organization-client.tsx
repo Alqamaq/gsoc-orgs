@@ -327,7 +327,7 @@ export function OrganizationClient({ organization: org }: OrganizationClientProp
                 {availableYears.map((year) => (
                   <Link
                     key={year}
-                    href={`/gsoc-${year}-organizations`}
+                    href={`/yearly/google-summer-of-code-${year}`}
                     prefetch={true}
                   >
                     <Badge

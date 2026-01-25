@@ -30,7 +30,6 @@ import {
   getCacheDurationForYear,
   getTagsForYear,
   createSearchCacheKey,
-  isHistoricalYear,
 } from "./cache";
 import { Prisma } from "@prisma/client";
 

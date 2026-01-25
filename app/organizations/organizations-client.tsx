@@ -15,9 +15,10 @@ const arraysEqual = (a: string[], b: string[]) =>
 interface OrganizationsClientProps {
   initialData: PaginatedResponse<Organization>
   initialPage: number
+  initialTechs: Array<{ name: string; count: number }>
 }
 
-export function OrganizationsClient({ initialData, initialPage }: OrganizationsClientProps) {
+export function OrganizationsClient({ initialData, initialPage, initialTechs }: OrganizationsClientProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [data, setData] = useState<PaginatedResponse<Organization>>(initialData)
@@ -198,39 +199,66 @@ export function OrganizationsClient({ initialData, initialPage }: OrganizationsC
       const newData = await response.json()
       setData(newData)
     } catch (error) {
-      console.error('Failed to fetch organizations:', error)
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Failed to fetch organizations:', error)
+      }
     } finally {
       setIsLoading(false)
     }
   }, [])
 
   // Handle page changes from URL
-  useEffect(() => {
-    const page = Number(searchParams.get('page')) || 1
-    if (page !== currentPage) {
-      setCurrentPage(page)
-      fetchOrganizations(page, filters)
-    }
-  }, [searchParams, currentPage, filters, fetchOrganizations])
-
-  // Only fetch when filters change (not on initial mount, as we have initialData)
+  // Only fetch if page actually changed AND we're not on initial mount
   useEffect(() => {
     if (isInitialMount.current) {
       return
     }
+    
+    const page = Number(searchParams.get('page')) || 1
+    if (page !== currentPage) {
+      setCurrentPage(page)
+      // Only fetch if we have dynamic filters (search or complex filters)
+      // Otherwise, pagination should be handled client-side with static data
+      const hasDynamicFilters = filters.search || 
+        filters.yearsLogic === 'AND' || 
+        filters.categoriesLogic === 'AND' ||
+        filters.techsLogic === 'AND' ||
+        filters.topicsLogic === 'AND' ||
+        (filters.years.length > 0 && filters.categories.length > 0 && filters.techs.length > 0)
+      
+      if (hasDynamicFilters) {
+        fetchOrganizations(page, filters)
+      }
+    }
+  }, [searchParams, currentPage, filters, fetchOrganizations])
+
+  // Only fetch when filters change (not on initial mount, as we have initialData)
+  // Only fetch if we have dynamic filters that require API (search or complex filters)
+  useEffect(() => {
+    if (isInitialMount.current) {
+      return
+    }
+    
+    // Determine if we need API (same logic as server)
+    const needsAPI = 
+      filters.search.trim().length > 0 ||
+      filters.yearsLogic === 'AND' ||
+      filters.categoriesLogic === 'AND' ||
+      filters.techsLogic === 'AND' ||
+      filters.topicsLogic === 'AND' ||
+      (filters.years.length > 0 && filters.categories.length > 0 && filters.techs.length > 0 && filters.topics.length > 0)
+    
+    // Only fetch if we need API, otherwise filters are handled client-side with static data
+    if (!needsAPI) {
+      return
+    }
+    
     // Reset to page 1 when filters change
     const page = 1
     setCurrentPage(page)
     fetchOrganizations(page, filters)
   }, [
-    filters.search,
-    filters.years,
-    filters.categories,
-    filters.techs,
-    filters.topics,
-    filters.firstTimeOnly,
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    JSON.stringify(filters.difficulties),
+    filters,
     fetchOrganizations,
   ])
 
@@ -308,43 +336,18 @@ export function OrganizationsClient({ initialData, initialPage }: OrganizationsC
     filters.firstTimeOnly ? { key: 'firstTimeOnly' as const, label: 'First-time orgs', value: 'true' } : null,
   ].filter((item): item is { key: 'years' | 'techs' | 'topics' | 'categories' | 'firstTimeOnly'; label: string; value: string } => item !== null)
 
-  // Helper to toggle a difficulty in the array
-  const toggleDifficulty = useCallback((difficulty: string) => {
-    const newDifficulties = filters.difficulties.includes(difficulty)
-      ? filters.difficulties.filter(d => d !== difficulty)
-      : [...filters.difficulties, difficulty]
-    handleFilterChange({ ...filters, difficulties: newDifficulties })
-  }, [filters, handleFilterChange])
-
-  // Check if a difficulty is selected
-  const isDifficultySelected = useCallback((difficulty: string) => {
-    return filters.difficulties.includes(difficulty)
-  }, [filters.difficulties])
 
   return (
     <div className="flex">
       {/* Sidebar - Fixed left, 280px width */}
       <aside className="hidden lg:block w-[280px] shrink-0 bg-background fixed top-20 lg:top-24 left-4 h-[calc(100vh-5rem)] lg:h-[calc(100vh-6rem)] overflow-y-auto custom-scrollbar">
-        <FiltersSidebar onFilterChange={handleFilterChange} filters={filters} />
+        <FiltersSidebar onFilterChange={handleFilterChange} filters={filters} availableTechs={initialTechs} />
       </aside>
 
       {/* Main Content - with left margin for sidebar */}
       <div className="flex-1 lg:ml-[280px]">
         <div className="max-w-6xl mx-auto px-6 py-8">
           {/* Header Section */}
-          {/* <div className="text-center mb-8">
-            <span className="inline-block px-3 py-1 text-xs font-medium bg-gray-100 text-gray-600 rounded-full mb-3 tracking-wide">
-              GSoC 2026
-            </span>
-            <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3 italic">
-              All Organizations
-            </h1>
-            <p className="text-base text-gray-600 max-w-xl mx-auto leading-relaxed">
-              Explore all Google Summer of Code participating organizations. Filter by 
-              technology, difficulty level, and find the perfect match for your skills and 
-              interests.
-            </p>
-          </div> */}
           <SectionHeader
             badge="GSoC 2026"
             title="All Organizations"
@@ -457,11 +460,6 @@ export function OrganizationsClient({ initialData, initialPage }: OrganizationsC
               ))}
             </div>
           )}
-
-          {/* Results Count */}
-          {/* <p className="text-sm text-gray-500 mb-6">
-            Showing {data.total} organizations
-          </p> */}
 
           {/* Organizations Grid */}
           <div className="mb-8">
