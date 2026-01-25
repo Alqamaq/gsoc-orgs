@@ -1,5 +1,6 @@
 import { MoveRight } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 
 interface Article {
@@ -36,6 +37,14 @@ const COMING_SOON_ARTICLES: Article[] = [
   },
 ];
 
+// Map articles to their corresponding images
+const ARTICLE_IMAGES: Record<string, string> = {
+  "1": "/blogs/google-summer-of-code-insights-trends.webp",
+  "2": "/blogs/gsoc-organizations-data.webp",
+  "3": "/blogs/gsoc-previous-year-insights.webp",
+  "4": "/blogs/gsoc-organizations-ai-filter.webp",
+};
+
 export function LatestArticles() {
   return (
     <section className="w-full py-12 lg:py-20">
@@ -58,7 +67,16 @@ export function LatestArticles() {
                 href="/blog"
                 className="flex flex-col gap-2 hover:opacity-75 cursor-pointer transition-opacity"
               >
-                <div className="bg-muted rounded-md aspect-video mb-4" />
+                <div className="bg-muted rounded-md aspect-video mb-4 overflow-hidden">
+                  <Image
+                    src={ARTICLE_IMAGES[article.id]}
+                    alt={article.title}
+                    width={400}
+                    height={300}
+                    className="w-full h-full object-cover"
+                    unoptimized
+                  />
+                </div>
                 <h3 className="text-xl tracking-tight">{article.title}</h3>
                 <p className="text-muted-foreground text-base">
                   {article.description}

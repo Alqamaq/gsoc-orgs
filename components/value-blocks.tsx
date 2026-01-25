@@ -1,5 +1,6 @@
 import { Badge } from "@/components/ui/badge";
 import { Building2, History, Code2, BarChart3 } from "lucide-react";
+import Image from "next/image";
 
 // Right-image block: Text flows right-to-left (right-aligned, towards the image)
 export function OrganizationsBlock() {
@@ -25,8 +26,15 @@ export function OrganizationsBlock() {
               </p>
             </div>
           </div>
-          <div className="bg-muted rounded-md w-full aspect-video flex items-center justify-center max-w-sm lg:max-w-md shrink-0">
-            <Building2 className="size-16 text-muted-foreground/50" />
+          <div className="bg-muted rounded-md w-full aspect-video flex items-center justify-center max-w-sm lg:max-w-md shrink-0 overflow-hidden">
+            <Image
+              src="/gsoc-organizations-data.webp"
+              alt="GSoC Organizations Data"
+              width={600}
+              height={400}
+              className="w-full h-full object-cover"
+              unoptimized
+            />
           </div>
         </div>
       </div>
@@ -40,8 +48,15 @@ export function PreviousEditionsBlock() {
     <section className="w-full py-12 lg:py-12">
       <div className="max-w-5xl mx-auto px-6 lg:px-12">
         <div className="flex flex-col-reverse lg:flex-row gap-10 lg:items-center lg:justify-center">
-          <div className="bg-muted rounded-md w-full aspect-video flex items-center justify-center max-w-sm lg:max-w-md shrink-0">
-            <History className="size-16 text-muted-foreground/50" />
+          <div className="bg-muted rounded-md w-full aspect-video flex items-center justify-center max-w-sm lg:max-w-md shrink-0 overflow-hidden">
+            <Image
+              src="/gsoc-previous-year-insights.webp"
+              alt="GSoC Previous Year Insights"
+              width={600}
+              height={400}
+              className="w-full h-full object-cover"
+              unoptimized
+            />
           </div>
           <div className="flex gap-4 flex-col flex-1">
             <div>
@@ -91,8 +106,15 @@ export function TechStackBlock() {
               </p>
             </div>
           </div>
-          <div className="bg-muted rounded-md w-full aspect-video flex items-center justify-center max-w-sm lg:max-w-md shrink-0">
-            <Code2 className="size-16 text-muted-foreground/50" />
+          <div className="bg-muted rounded-md w-full aspect-video flex items-center justify-center max-w-sm lg:max-w-md shrink-0 overflow-hidden">
+            <Image
+              src="/gsoc-organizations-ai-filter.webp"
+              alt="GSoC Organizations AI Filter"
+              width={600}
+              height={400}
+              className="w-full h-full object-cover"
+              unoptimized
+            />
           </div>
         </div>
       </div>
@@ -106,8 +128,15 @@ export function AnalyticsBlock() {
     <section className="w-full py-12 lg:py-12">
       <div className="max-w-5xl mx-auto px-6 lg:px-12">
         <div className="flex flex-col-reverse lg:flex-row gap-10 lg:items-center lg:justify-center">
-          <div className="bg-muted rounded-md w-full aspect-video flex items-center justify-center max-w-sm lg:max-w-md shrink-0">
-            <BarChart3 className="size-16 text-muted-foreground/50" />
+          <div className="bg-muted rounded-md w-full aspect-video flex items-center justify-center max-w-sm lg:max-w-md shrink-0 overflow-hidden">
+            <Image
+              src="/google-summer-of-code-insights-trends.webp"
+              alt="Google Summer of Code Insights and Trends"
+              width={600}
+              height={400}
+              className="w-full h-full object-cover"
+              unoptimized
+            />
           </div>
           <div className="flex gap-4 flex-col flex-1">
             <div>
