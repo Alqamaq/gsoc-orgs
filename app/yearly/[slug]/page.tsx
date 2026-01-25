@@ -5,8 +5,6 @@ import type { Metadata } from "next";
 import {
   Users,
   ArrowRight,
-  TrendingUp,
-  Award,
   Sparkles,
 } from "lucide-react";
 import {
@@ -21,7 +19,7 @@ import {
 } from "@/components/ui";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/Footer";
-import { loadYearlyPageData, YearlyPageData } from "@/lib/yearly-page-types";
+import { loadYearlyPageData } from "@/lib/yearly-page-types";
 import { getFullUrl } from "@/lib/constants";
 import { ExpandableOrgList, ExpandableProjectList, MentorsContributorsTable } from "./client-components";
 import {
@@ -68,7 +66,7 @@ export async function generateMetadata({
     };
   }
   
-  const { year, title, description, metrics } = data;
+  const { title, description } = data;
   const canonicalUrl = getFullUrl(`/yearly/${slug}`);
   
   return {
@@ -262,7 +260,7 @@ export default async function YearlyPage({
                     </div>
                     
                     <div className="space-y-2 mt-4">
-                      {charts.project_difficulty_distribution.data.map((diff: { label: string; value: number; percentage?: number }, index) => {
+                      {charts.project_difficulty_distribution.data.map((diff: { label: string; value: number; percentage?: number }) => {
                         const tealColors = ["#0d9488", "#14b8a6", "#2dd4bf"];
                         // Map labels to match colors if order is guaranteed, typically Beginner/Intermediate/Advanced
                         // Our JSON has "Beginner", "Intermediate", "Advanced"
@@ -573,38 +571,3 @@ function ChartCard({
   );
 }
 
-function BarRow({
-  rank,
-  label,
-  value,
-  maxValue,
-  subtitle,
-}: {
-  rank: number;
-  label: string;
-  value: number;
-  maxValue: number;
-  subtitle?: string;
-}) {
-  const percentage = Math.round((value / maxValue) * 100);
-
-  return (
-    <div className="flex items-center gap-3">
-      <span className="text-xs text-muted-foreground w-4">{rank}</span>
-      <div className="flex-1">
-        <div className="flex justify-between text-sm mb-1">
-          <span className="font-medium truncate">{label}</span>
-          <span className="text-muted-foreground shrink-0 ml-2">
-            {value} {subtitle}
-          </span>
-        </div>
-        <div className="h-2 bg-muted rounded-full overflow-hidden">
-          <div
-            className="h-full bg-primary rounded-full transition-all"
-            style={{ width: `${percentage}%` }}
-          />
-        </div>
-      </div>
-    </div>
-  );
-}

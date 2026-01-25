@@ -245,7 +245,7 @@ export default async function ProjectsYearPage({
                     </div>
                     
                     <div className="space-y-2 mt-4">
-                      {charts.project_difficulty_distribution.data.map((diff, index) => {
+                      {charts.project_difficulty_distribution.data.map((diff) => {
                         const tealColors = ["#0d9488", "#14b8a6", "#2dd4bf"];
                         const colorIndex = diff.label === "Beginner" ? 0 : diff.label === "Intermediate" ? 1 : 2;
                         const percentage = diff.percentage || Math.round((diff.value / metrics.total_projects) * 100) || 0;

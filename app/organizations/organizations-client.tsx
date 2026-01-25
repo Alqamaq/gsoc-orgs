@@ -258,18 +258,7 @@ export function OrganizationsClient({ initialData, initialPage, initialTechs }: 
     setCurrentPage(page)
     fetchOrganizations(page, filters)
   }, [
-    filters.search,
-    filters.years,
-    filters.categories,
-    filters.techs,
-    filters.topics,
-    filters.firstTimeOnly,
-    filters.yearsLogic,
-    filters.categoriesLogic,
-    filters.techsLogic,
-    filters.topicsLogic,
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    JSON.stringify(filters.difficulties),
+    filters,
     fetchOrganizations,
   ])
 
@@ -347,18 +336,6 @@ export function OrganizationsClient({ initialData, initialPage, initialTechs }: 
     filters.firstTimeOnly ? { key: 'firstTimeOnly' as const, label: 'First-time orgs', value: 'true' } : null,
   ].filter((item): item is { key: 'years' | 'techs' | 'topics' | 'categories' | 'firstTimeOnly'; label: string; value: string } => item !== null)
 
-  // Helper to toggle a difficulty in the array
-  const toggleDifficulty = useCallback((difficulty: string) => {
-    const newDifficulties = filters.difficulties.includes(difficulty)
-      ? filters.difficulties.filter(d => d !== difficulty)
-      : [...filters.difficulties, difficulty]
-    handleFilterChange({ ...filters, difficulties: newDifficulties })
-  }, [filters, handleFilterChange])
-
-  // Check if a difficulty is selected
-  const isDifficultySelected = useCallback((difficulty: string) => {
-    return filters.difficulties.includes(difficulty)
-  }, [filters.difficulties])
 
   return (
     <div className="flex">

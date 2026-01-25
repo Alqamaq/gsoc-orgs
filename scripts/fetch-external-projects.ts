@@ -23,7 +23,6 @@ interface ApiResponse {
 
 export async function fetchExternalProjects(year: number): Promise<ExternalProject[]> {
   const allProjects: ExternalProject[] = [];
-  let currentPage = 1;
   let totalPages = 1;
 
   console.log(`[External API] Fetching projects for year ${year}...`);

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo } from "react";
 import Link from "next/link";
 import { Search, TrendingUp, ArrowUpDown } from "lucide-react";
 import {
@@ -20,14 +20,20 @@ interface TechStackClientWrapperProps {
 type SortOption = "name" | "org-count-desc" | "org-count-asc" | "project-count-desc";
 
 export function TechStackClientWrapper({ techs }: TechStackClientWrapperProps) {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [sortBy, setSortBy] = useState<SortOption>("org-count-desc");
+  const [searchQuery, setSearchQueryState] = useState("");
+  const [sortBy, setSortByState] = useState<SortOption>("org-count-desc");
   const [visibleCount, setVisibleCount] = useState(24);
 
-  // Reset visible count when search or sort changes
-  useEffect(() => {
+  // Wrapped setters that reset visible count when search or sort changes
+  const setSearchQuery = (value: string) => {
+    setSearchQueryState(value);
     setVisibleCount(24);
-  }, [searchQuery, sortBy]);
+  };
+
+  const setSortBy = (value: SortOption) => {
+    setSortByState(value);
+    setVisibleCount(24);
+  };
 
   // Filter and sort - CLIENT-SIDE ONLY
   const filteredTechs = useMemo(() => {

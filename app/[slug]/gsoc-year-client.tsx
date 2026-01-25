@@ -2,10 +2,9 @@
 
 import { useState, useMemo } from "react";
 import Link from "next/link";
-import Image from "next/image";
-import { Search, ChevronDown, ChevronUp } from "lucide-react";
+import { Search } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, LabelList } from "recharts";
-import { Input, CardWrapper, Heading, Text, Button, Grid } from "@/components/ui";
+import { Input, CardWrapper, Heading, Text, Button } from "@/components/ui";
 import { ProjectCard } from "@/components/project-card";
 import { Organization } from "@/lib/api";
 
@@ -35,7 +34,8 @@ interface GSoCYearClientProps {
 
 export function GSoCYearClient({
   year,
-  organizations,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  organizations, // Used in commented code section (lines 216-290) - will be enabled later
   projects,
   highestSelectionsByTech,
   highestSelectionsByOrg,
@@ -45,10 +45,6 @@ export function GSoCYearClient({
   const [nameSearch, setNameSearch] = useState("");
   const [showAllProjects, setShowAllProjects] = useState(false);
   const [showAllMentors, setShowAllMentors] = useState(false);
-  const [showAllOrgs, setShowAllOrgs] = useState(false);
-
-  // Display orgs for first-time organizations section
-  const displayedOrgs = showAllOrgs ? organizations : organizations.slice(0, 6);
 
   // Filter projects based on search
   const filteredProjects = useMemo(() => {
