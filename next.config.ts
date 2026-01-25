@@ -28,6 +28,22 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  async redirects() {
+    // 301 redirects from old /gsoc-YYYY-organizations to new /yearly/google-summer-of-code-YYYY
+    // This preserves SEO link equity and ensures Google indexes only the new URLs
+    const redirects = [];
+    
+    // Generate redirects for years 2016-2030 (reasonable upper bound)
+    for (let year = 2016; year <= 2030; year++) {
+      redirects.push({
+        source: `/gsoc-${year}-organizations`,
+        destination: `/yearly/google-summer-of-code-${year}`,
+        permanent: true, // 301 redirect
+      });
+    }
+    
+    return redirects;
+  },
 };
 
 export default nextConfig;

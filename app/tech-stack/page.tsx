@@ -84,11 +84,13 @@ export default async function TechStackPage() {
                     Most popular technologies in GSoC
                   </Text>
                 </div>
-                <TopStacksChart data={data.charts.top_tech_by_orgs.map(t => ({
-                  name: t.label,
-                  slug: t.slug,
-                  count: t.value
-                }))} />
+                <TopStacksChart data={data.charts.top_tech_by_orgs
+                  .filter(t => t.slug !== undefined)
+                  .map(t => ({
+                    name: t.label,
+                    slug: t.slug!,
+                    count: t.value
+                  }))} />
               </CardWrapper>
             </Grid>
 

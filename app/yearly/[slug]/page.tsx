@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
+import type { Metadata } from "next";
 import {
   Users,
   ArrowRight,
@@ -21,6 +22,7 @@ import {
 import { Header } from "@/components/header";
 import { Footer } from "@/components/Footer";
 import { loadYearlyPageData, YearlyPageData } from "@/lib/yearly-page-types";
+import { getFullUrl } from "@/lib/constants";
 import { ExpandableOrgList, ExpandableProjectList, MentorsContributorsTable } from "./client-components";
 import {
   StudentSlotsBarChart,
@@ -47,6 +49,60 @@ export async function generateStaticParams() {
     { slug: "google-summer-of-code-2017" },
     { slug: "google-summer-of-code-2016" },
   ];
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  
+  // Load data from static JSON (cached at build time)
+  const data = await loadYearlyPageData(slug);
+  
+  if (!data) {
+    return {
+      title: "GSoC Organizations | Google Summer of Code",
+      description: "Explore organizations participating in Google Summer of Code.",
+    };
+  }
+  
+  const { year, title, description, metrics } = data;
+  const canonicalUrl = getFullUrl(`/yearly/${slug}`);
+  
+  return {
+    title: `${title} | GSoC Organizations Guide`,
+    description,
+    robots: {
+      index: true,
+      follow: true,
+    },
+    openGraph: {
+      title,
+      description,
+      url: canonicalUrl,
+      type: "website",
+      siteName: "GSoC Organizations Guide",
+      images: [
+        {
+          url: getFullUrl("/og/gsoc-organizations-guide.jpg"),
+          width: 1200,
+          height: 630,
+          alt: "GSoC Organizations Guide",
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [getFullUrl("/og/gsoc-organizations-guide.jpg")],
+    },
+    alternates: {
+      canonical: canonicalUrl,
+    },
+  };
 }
 
 export default async function YearlyPage({

@@ -86,13 +86,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     '/topics',
   ]
 
-  // Generate year-based routes (2005 to current year - 1, excluding future years)
+  // Generate year-based routes (2016 to current year - 1, excluding future years)
   // Only include years that have actually completed GSoC
+  // Using new /yearly/google-summer-of-code-YYYY format for SEO
   const currentYear = new Date().getFullYear()
   const lastCompletedYear = currentYear - 1 // Exclude current year and future years
   const yearRoutes = []
-  for (let year = 2005; year <= lastCompletedYear; year++) {
-    yearRoutes.push(`/gsoc-${year}-organizations`)
+  for (let year = 2016; year <= lastCompletedYear; year++) {
+    yearRoutes.push(`/yearly/google-summer-of-code-${year}`)
   }
 
   // Combine all routes with appropriate priorities
