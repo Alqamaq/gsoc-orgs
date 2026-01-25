@@ -206,19 +206,51 @@ export function OrganizationsClient({ initialData, initialPage, initialTechs }: 
   }, [])
 
   // Handle page changes from URL
-  useEffect(() => {
-    const page = Number(searchParams.get('page')) || 1
-    if (page !== currentPage) {
-      setCurrentPage(page)
-      fetchOrganizations(page, filters)
-    }
-  }, [searchParams, currentPage, filters, fetchOrganizations])
-
-  // Only fetch when filters change (not on initial mount, as we have initialData)
+  // Only fetch if page actually changed AND we're not on initial mount
   useEffect(() => {
     if (isInitialMount.current) {
       return
     }
+    
+    const page = Number(searchParams.get('page')) || 1
+    if (page !== currentPage) {
+      setCurrentPage(page)
+      // Only fetch if we have dynamic filters (search or complex filters)
+      // Otherwise, pagination should be handled client-side with static data
+      const hasDynamicFilters = filters.search || 
+        filters.yearsLogic === 'AND' || 
+        filters.categoriesLogic === 'AND' ||
+        filters.techsLogic === 'AND' ||
+        filters.topicsLogic === 'AND' ||
+        (filters.years.length > 0 && filters.categories.length > 0 && filters.techs.length > 0)
+      
+      if (hasDynamicFilters) {
+        fetchOrganizations(page, filters)
+      }
+    }
+  }, [searchParams, currentPage, filters, fetchOrganizations])
+
+  // Only fetch when filters change (not on initial mount, as we have initialData)
+  // Only fetch if we have dynamic filters that require API (search or complex filters)
+  useEffect(() => {
+    if (isInitialMount.current) {
+      return
+    }
+    
+    // Determine if we need API (same logic as server)
+    const needsAPI = 
+      filters.search.trim().length > 0 ||
+      filters.yearsLogic === 'AND' ||
+      filters.categoriesLogic === 'AND' ||
+      filters.techsLogic === 'AND' ||
+      filters.topicsLogic === 'AND' ||
+      (filters.years.length > 0 && filters.categories.length > 0 && filters.techs.length > 0 && filters.topics.length > 0)
+    
+    // Only fetch if we need API, otherwise filters are handled client-side with static data
+    if (!needsAPI) {
+      return
+    }
+    
     // Reset to page 1 when filters change
     const page = 1
     setCurrentPage(page)
@@ -230,6 +262,10 @@ export function OrganizationsClient({ initialData, initialPage, initialTechs }: 
     filters.techs,
     filters.topics,
     filters.firstTimeOnly,
+    filters.yearsLogic,
+    filters.categoriesLogic,
+    filters.techsLogic,
+    filters.topicsLogic,
     // eslint-disable-next-line react-hooks/exhaustive-deps
     JSON.stringify(filters.difficulties),
     fetchOrganizations,

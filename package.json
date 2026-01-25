@@ -10,7 +10,9 @@
     "type-check": "tsc --noEmit",
     "validate": "pnpm lint && pnpm type-check && pnpm build",
     "postinstall": "prisma generate",
-    "prepare": "husky"
+    "prepare": "husky",
+    "generate:organizations": "node scripts/generate-organizations-data.js",
+    "generate:tech-stack": "node scripts/generate-tech-stack-data.js"
   },
   "dependencies": {
     "@prisma/client": "5.22.0",

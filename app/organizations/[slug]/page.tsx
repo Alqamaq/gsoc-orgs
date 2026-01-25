@@ -5,6 +5,7 @@ import { apiFetchServer } from "@/lib/api.server";
 import { OrganizationClient } from "./organization-client";
 import { FooterSmall } from "@/components/footer-small";
 import { getFullUrl } from "@/lib/constants";
+import { loadOrganizationData } from "@/lib/organizations-page-types";
 
 /**
  * Organization Detail Page
@@ -18,6 +19,8 @@ import { getFullUrl } from "@/lib/constants";
  * - Participation and project charts
  * - Programming languages and difficulty distribution
  * - Organization-specific FAQ
+ * 
+ * Uses static JSON by default, falls back to API if JSON not available.
  */
 
 /**
@@ -59,6 +62,13 @@ interface OrganizationWithStats extends Organization {
 }
 
 async function getOrganization(slug: string): Promise<OrganizationWithStats | null> {
+  // Try static JSON first
+  const jsonData = await loadOrganizationData(slug);
+  if (jsonData) {
+    return jsonData as OrganizationWithStats;
+  }
+
+  // Fallback to API if JSON not available
   try {
     return await apiFetchServer<OrganizationWithStats>(`/api/organizations/${slug}`);
   } catch (error: unknown) {
