@@ -1,13 +1,17 @@
-import { GitHubIcon, } from '@/components/icons'
+import { GitHubIcon } from '@/components/icons'
 import { Badge, Heading, Text } from "@/components/ui";
 import { CHANGELOG_ENTRIES } from "@/lib/changelog-data";
 import { Metadata } from "next";
 import { Header } from "@/components/header";
 import { FooterSmall } from "@/components/footer-small";
+import { getFullUrl } from '@/lib/constants';
 
 export const metadata: Metadata = {
   title: "Changelog | GSoC Orgs",
   description: "Stay up to date with the latest features, improvements, and fixes for GSoC Orgs.",
+  alternates: {
+    canonical: getFullUrl("/changelog"),
+  },
 };
 
 export default function ChangelogPage() {
@@ -72,14 +76,15 @@ export default function ChangelogPage() {
                   </Badge>
                 </div>
                 <div className="hidden md:flex flex-col items-end gap-2 mt-4">
-                  {entry.prsLink.map((pr, i) => (
+                  {entry.prLinks.map((pr, i) => (
                     <a
                       key={i}
                       href={pr.link}
                       target="_blank"
-                      className="flex items-center gap-1.5 text-xs text-teal-600 dark:text-teal-400 hover:underline transition-colors group"
+                      rel='noopener noreferrer'
+                      className="flex items-center gap-1.5 text-xs text-accent-foreground hover:underline hover:text-teal-600 transition-colors group"
                     >
-                      <GitHubIcon className="w-3 h-3 text-muted-foreground group-hover:text-teal-600" />
+                      <GitHubIcon className="w-3 h-3 text-accent-foreground hover:text-teal-600" />
                       <span>{pr.number}</span>
                     </a>
                   ))}
@@ -102,23 +107,13 @@ export default function ChangelogPage() {
                   ))}
                 </ul>
 
-                {entry.images && entry.images.length > 0 && (
-                  <div className="pt-4">
-                    <div className="rounded-xl overflow-hidden border border-border bg-muted/20 shadow-sm">
-                      {entry.images.map((img, i) => (
-                        <img key={i} src={img} alt="Update" className="w-full h-auto" />
-                      ))}
-                    </div>
-                  </div>
-                )}
-
                 {/* Mobile PR Link */}
                 <div className="flex md:hidden flex-wrap gap-x-4 gap-y-2 pt-4 border-t border-border">
-                  {entry.prsLink.map((pr, i) => (
+                  {entry.prLinks.map((pr, i) => (
                     <a
                       key={i}
                       href={pr.link}
-                      className="flex items-center gap-2 text-sm text-teal-600 dark:text-teal-400 font-medium"
+                      className="flex items-center gap-2 text-sm text-accent-foreground font-medium"
                     >
                       <GitHubIcon className="w-4 h-4" />
                       {pr.number}

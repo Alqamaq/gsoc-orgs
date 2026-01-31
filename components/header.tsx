@@ -14,7 +14,6 @@ const menuItems = [
     { name: 'Technologies', href: '/tech-stack' },
     { name: 'Topics', href: '/topics' },
     { name: 'Yearly', href: '/yearly' },
-    { name: 'Changelog', href: '/changelog' },
     // { name: 'Resources', href: '#resources' },
     // { name: 'About Us', href: '#about' },
     // { name: 'Contact', href: '#contact' },

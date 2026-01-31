@@ -1,15 +1,14 @@
 export interface ChangelogEntry {
-    date:string,
-    timeStamp: number,
-    version : string,
-    title: string,
-    summary: string,
-    prsLink : {link:string, number: string}[],
-    images? : string[],
-    changes: {
-        type: 'feat' | 'fix' | 'docs' | 'style' | 'refactor' | 'perf' | 'test' | 'chore',
-        text: string
-    }[],
+  date: string,
+  timeStamp: number,
+  version: string,
+  title: string,
+  summary: string,
+  prLinks: { link: string, number: string }[],
+  changes: {
+    type: 'feat' | 'fix' | 'docs' | 'style' | 'refactor' | 'perf' | 'test' | 'chore',
+    text: string
+  }[],
 
 }
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
@@ -19,12 +18,12 @@ export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
     version: "v1.1.0",
     title: "Dark Mode & UI Stabilization",
     summary: "Refined the dashboard's visual hierarchy by introducing a refined color system and fixing high-contrast issues in dark mode.",
-    prsLink :[
+    prLinks: [
       { link: "https://github.com/...", number: "#1" },
       { link: "https://github.com/...", number: "#2" },
       { link: "https://github.com/...", number: "#3" },
     ],
-    images: ["https://placehold.co/1200x600/111/fff?text=Dark+Mode+Preview"],
+
     changes: [
       { type: 'fix', text: 'Sidebar background now correctly renders black in dark mode' },
       { type: 'feat', text: 'Added new [filtering system](https://github.com/...) for better organization discovery.' },
@@ -37,12 +36,12 @@ export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
     version: "v1.1.0",
     title: "Dark Mode & UI Stabilization",
     summary: "Refined the dashboard's visual hierarchy by introducing a refined color system and fixing high-contrast issues in dark mode.",
-    prsLink :[
+    prLinks: [
       { link: "https://github.com/...", number: "#3" },
       { link: "https://github.com/...", number: "#4" },
       { link: "https://github.com/...", number: "#5" },
       { link: "https://github.com/...", number: "#6" },
-    ],  
+    ],
     changes: [
       { type: 'fix', text: 'Sidebar background now correctly renders black in dark mode' },
       { type: 'feat', text: ' Added new [filtering system](https://github.com/...) for better organization discovery.' },
