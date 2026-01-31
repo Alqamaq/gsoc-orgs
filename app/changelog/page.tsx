@@ -64,8 +64,8 @@ export default function ChangelogPage() {
           {/* The Timeline Line */}
           <div className="absolute left-[11px] md:left-[155px] top-2 bottom-0 w-px bg-border hidden sm:block" />
 
-          {sortedEntries.map((entry, idx) => (
-            <article key={idx} className="relative grid grid-cols-1 md:grid-cols-[140px_1fr] gap-8 md:gap-12 pb-16 border-b border-border last:border-0">
+          {sortedEntries.map((entry) => (
+            <article key={entry.timeStamp} className="relative grid grid-cols-1 md:grid-cols-[140px_1fr] gap-8 md:gap-12 pb-16 border-b border-border last:border-0">
 
               {/* Left Column: Date & Version */}
               <div className="md:sticky md:top-24 h-fit">
