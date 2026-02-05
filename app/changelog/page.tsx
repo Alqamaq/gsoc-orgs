@@ -5,7 +5,7 @@ import { Metadata } from "next";
 import { Header } from "@/components/header";
 import { FooterSmall } from "@/components/footer-small";
 import { getFullUrl } from '@/lib/constants';
-import { chartColors } from '@/lib/theme';
+
 
 export const metadata: Metadata = {
   title: "Changelog | GSoC Orgs",
@@ -36,8 +36,7 @@ export default function ChangelogPage() {
           href={match[2]}
           target="_blank"
           rel="noopener noreferrer"
-          style={{ color: chartColors.accent.primary }}
-          className="hover:underline font-medium transition-colors"
+          className="hover:underline text-chart-2 font-medium transition-colors"
         >
           {match[1]}
         </a>
@@ -57,7 +56,7 @@ export default function ChangelogPage() {
       <Header />
       <div className="max-w-5xl mx-auto py-12 px-6">
 
-        <header className="mb-16 mt-15 border-b border-border pb-8">
+        <header className="mb-16 mt-[60px] border-b border-border pb-8">
           <Heading className="text-3xl md:text-5xl tracking-tighter font-regular max-w-xl">Changelog</Heading>
           <Text className="text-base leading-relaxed text-muted-foreground max-w-xl lg:max-w-lg mt-4">The latest updates and improvements.</Text>
         </header>
@@ -84,8 +83,7 @@ export default function ChangelogPage() {
                       href={pr.link}
                       target="_blank"
                       rel='noopener noreferrer'
-                      style={{ color: chartColors.accent.primary }}
-                      className="flex items-center gap-1.5 text-xs text-accent-foreground hover:underline transition-colors group"
+                      className="flex items-center gap-1.5 text-xs text-chart-2 hover:underline transition-colors group"
                     >
                       <GitHubIcon className="w-3 h-3" />
                       <span>{pr.number}</span>
@@ -116,8 +114,7 @@ export default function ChangelogPage() {
                     <a
                       key={i}
                       href={pr.link}
-                      style={{ color: chartColors.accent.primary }}
-                      className="flex items-center gap-2 text-sm text-accent-foreground font-medium"
+                      className="flex items-center gap-2 text-sm text-chart-2 font-medium"
                     >
                       <GitHubIcon className="w-4 h-4" />
                       {pr.number}
